@@ -64,7 +64,7 @@ Every term lives in a searchable glossary, organized by course. Quiz yourself fr
 </td>
 </tr>
 <tr>
-<td><img src=".github/media/pdf-viewer.png" alt="Margin's PDF viewer with highlighted terms and a Terms in this PDF panel"></td>
+<td><img src=".github/media/pdf-viewer.png" alt="Margin's PDF viewer with a saved term underlined and the Suggested panel listing the lecture's key terms"></td>
 <td><img src=".github/media/quiz.png" alt="Quiz card asking for the term that matches a definition"></td>
 </tr>
 </table>
