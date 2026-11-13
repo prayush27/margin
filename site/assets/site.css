@@ -247,8 +247,8 @@ mark.u { background: linear-gradient(var(--mark), var(--mark)) 0 0 / 0% 100% no-
 .map .arrow { height: 1px; background: var(--amber); position: relative; }
 .map .arrow::after { content: ""; position: absolute; right: -1px; top: -3px; border: 3.5px solid transparent; border-left: 5px solid var(--amber); }
 .map .srcs { padding-left: 10px; color: var(--ink-2); line-height: 1.35; }
-.stat { display: flex; flex-direction: column; justify-content: space-between; min-height: 190px; }
-.stat .big { margin: 0; font: 700 clamp(44px, 5.4vw, 64px)/1 var(--sans); letter-spacing: -0.045em; background: linear-gradient(135deg, #e69a2c, #b86e0c); -webkit-background-clip: text; background-clip: text; color: transparent; font-variant-numeric: tabular-nums; }
+.stat { container-type: inline-size; display: flex; flex-direction: column; justify-content: space-between; min-height: 190px; }
+.stat .big { margin: 0; font: 700 min(64px, 32cqi)/1 var(--sans); letter-spacing: -0.04em; color: var(--amber-ink); white-space: nowrap; font-variant-numeric: tabular-nums; }
 .stat p:last-child { margin: 18px 0 0; font-size: 15px; line-height: 1.4; color: var(--ink-2); }
 .stat.dark { background: var(--night); box-shadow: none; }
 .stat.dark .big { background: none; color: #fff; }
@@ -263,7 +263,6 @@ mark.u { background: linear-gradient(var(--mark), var(--mark)) 0 0 / 0% 100% no-
   .map .srcs { padding-left: 0; }
   .tile { padding: 22px; }
   .stat { min-height: 150px; }
-  .stat .big { font-size: clamp(34px, 10vw, 44px); }
   .stat-wide { grid-column: 1 / -1; min-height: 0; gap: 18px; }
 }
 
