@@ -6,7 +6,7 @@
 //   3. Specificity           how unusual the phrase is in everyday English (word frequencies from wordfreq)
 //   4. Emphasis              repeats, how many pages it's on, and whether it's in a slide title
 //
-// An optional on-device AI pass (ai.js) can re-rank the top candidates afterwards.
+// Every suggested definition comes from the slides or a textbook, never generated text.
 // No Chrome APIs here, so it's unit-tested in tests/run.mjs.
 
 import { buildMatcher } from "./matcher.js";

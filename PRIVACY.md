@@ -19,7 +19,7 @@ Only one feature talks to the internet: the **Find one** tab on the save card. W
 
 Nothing else is sent: no page URL, page text, course name, glossary or identifier. Answers are cached locally so the same lookup isn't repeated. If you only use **Write my own**, Margin makes no network requests at all. OpenStax and NIST definitions are bundled inside the extension and work offline.
 
-**Suggested terms** in the PDF viewer run entirely on your computer: the PDF's text is compared with the bundled glossaries and word lists, and never leaves your browser. On computers where Chrome's built-in AI model (Gemini Nano) is available, Margin also asks that model to rank the suggestions. The model runs on your device inside Chrome; Margin sends nothing to Google or anyone else for this.
+**Suggested terms** in the PDF viewer run entirely on your computer: the PDF's text is compared with the bundled glossaries and word lists, and never leaves your browser.
 
 When you open a PDF from the web, Margin's viewer downloads that PDF from its original address, the same way Chrome's own viewer would.
 

@@ -144,7 +144,7 @@ A few details:
 - **Fast matching.** The glossary compiles into two regular expressions (one case-sensitive, for acronyms like “OS”) that find every term, plural and alias in a single pass, longest match first. A `MutationObserver` catches content that loads later, and text boxes and editors are skipped.
 - **PDFs are first-class.** A `webRequest` listener spots PDF responses and opens them in Margin's PDF.js viewer, where the same highlighter runs on the text layer.
 - **Smart suggestions.** `lookup.js` maps course codes to subjects, queries the right sources in parallel with timeouts, ranks results by how well they fit the course, and caches answers.
-- **Key-term finder.** `keyterms.js` scores every candidate in a lecture with four signals: matches in the course's textbook glossaries, definitions written on the slides ("A heap is…", "Load factor: …"), how rare the phrase is in everyday English ([wordfreq](https://github.com/rspeer/wordfreq) frequencies), and emphasis (repeats, pages, slide titles). When Chrome's on-device model is available, `ai.js` re-ranks the top candidates and drafts missing definitions, labelled as AI drafts.
+- **Key-term finder.** `keyterms.js` scores every candidate in a lecture with four signals: matches in the course's textbook glossaries, definitions written on the slides ("A heap is…", "Load factor: …"), how rare the phrase is in everyday English ([wordfreq](https://github.com/rspeer/wordfreq) frequencies), and emphasis (repeats, pages, slide titles). Every suggested definition comes from the slides or a textbook, never generated text.
 - **Zero dependencies, no build step.** Plain ES modules. Clone it, load it, edit it.
 
 ## Development
@@ -161,7 +161,7 @@ No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaS
 
 - [x] Hover definitions on any page, PDF viewer, glossary, quiz
 - [x] **Find one**: subject-aware definitions from textbooks, field references and encyclopedias
-- [x] **Suggested terms** in lecture PDFs: glossary matches, slide definitions and word-rarity scoring, optionally re-ranked by Chrome's on-device AI
+- [x] **Suggested terms** in lecture PDFs: glossary matches, slide definitions and word-rarity scoring
 - [ ] Lecture videos: catch terms in captions, with “explained at 34:12” timestamps
 - [ ] Suggested terms on course web pages, not just PDFs
 - [ ] Chrome Web Store release (the only official download)

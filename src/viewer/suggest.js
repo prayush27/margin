@@ -1,11 +1,9 @@
 // The "Suggested" tab in the PDF side panel: key terms in this lecture you haven't saved yet,
-// with definitions ready, saved in one click. Scoring lives in shared/keyterms.js; the optional
-// on-device AI pass in shared/ai.js.
+// with definitions ready, saved in one click. Scoring lives in shared/keyterms.js.
 
 import * as store from "../shared/storage.js";
 import { findKeyTerms } from "../shared/keyterms.js";
 import { glossaryFor, subjectFor } from "../shared/lookup.js";
-import { aiStatus, refineWithAI } from "../shared/ai.js";
 
 const PRECHECK = 5;
 const FIRST_SHOWN = 12;
@@ -24,7 +22,6 @@ function el(tag, props = {}, ...children) {
   for (const [k, v] of Object.entries(props)) {
     if (v == null || v === false) continue;
     if (k === "class") n.className = v;
-    else if (k === "innerHTML") n.innerHTML = v;
     else if (k.startsWith("on")) n.addEventListener(k.slice(2), v);
     else if (k in n && typeof v !== "string") n[k] = v;
     else n.setAttribute(k, v === true ? "" : v);
@@ -32,8 +29,6 @@ function el(tag, props = {}, ...children) {
   for (const c of children.flat()) if (c != null && c !== false) n.append(c.nodeType ? c : document.createTextNode(String(c)));
   return n;
 }
-
-const SPARK = '<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5l1.4 4.1 4.1 1.4-4.1 1.4L8 12.5 6.6 8.4 2.5 7l4.1-1.4z" fill="currentColor"/></svg>';
 
 /**
  * @param {object} o
@@ -49,14 +44,9 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
   let courseChoice = null; // course id, or "" with typedCourse for a new one
   let typedCourse = "";
   let base = []; // findKeyTerms output for this doc + course
-  let refined = null; // AI-refined list, when it ran
   let checked = new Set();
   let showAll = false;
-  let ai = { status: "unknown", running: false, progress: 0, error: "" };
   let computeId = 0;
-  let aiAbort = null;
-
-  const subjectKey = () => `${docKey}|${courseChoice || "new:" + typedCourse.toLowerCase()}`;
 
   async function currentCourse() {
     const { courses, settings } = await store.getAll();
@@ -74,11 +64,8 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
     if (newDoc || doc.url !== docKey) {
       docKey = doc.url || doc.name || "";
       base = [];
-      refined = null;
       checked = new Set();
       showAll = false;
-      aiAbort?.abort();
-      ai = { ...ai, running: false, progress: 0, error: "" };
     }
     const text = getText();
     if (!text.done) {
@@ -93,53 +80,13 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
     if (id !== computeId) return;
     const firstRun = !base.length;
     base = findKeyTerms({ pages: text.pages, glossary, saved: terms, zipf, docTitle: doc.title || doc.name || "", limit: 40 });
-    if (refined) refined = refined.filter((c) => base.some((b) => b.key === c.key));
     if (firstRun) for (const c of base.slice(0, PRECHECK)) if (strongPick(c)) checked.add(c.key);
     for (const k of checked) if (!base.some((c) => c.key === k)) checked.delete(k);
-    onCount(list().length);
+    onCount(base.length);
     render({ courses, subject });
-    if (ai.status === "unknown") ai.status = await aiStatus();
-    if (ai.status === "available" && !refined && !ai.running && base.length) runAI({ name, subject });
-    else render({ courses, subject });
   }
 
-  const list = () => refined || base;
-
-  async function runAI({ name, subject }) {
-    const key = subjectKey();
-    aiAbort = new AbortController();
-    ai = { ...ai, running: true, progress: 0, error: "" };
-    render({});
-    try {
-      const out = await refineWithAI(base, {
-        course: name,
-        subject,
-        docTitle: getDoc().title,
-        signal: aiAbort.signal,
-        onProgress: (loaded, done) => {
-          ai.progress = done ?? loaded ?? 0;
-          render({});
-        },
-      });
-      if (key !== subjectKey()) return;
-      refined = out;
-      ai.status = "available";
-      // Keep the pre-checked picks in step with the new order.
-      const top = out.slice(0, PRECHECK).filter(strongPick).map((c) => c.key);
-      checked = new Set([...checked].filter((k) => out.some((c) => c.key === k)));
-      if (checked.size < PRECHECK) for (const k of top) checked.add(k);
-      onCount(list().length);
-    } catch (err) {
-      if (err?.name !== "AbortError") {
-        ai.error = "The on-device model couldn't run right now.";
-        ai.status = await aiStatus();
-        console.debug("[Margin] on-device AI failed", err);
-      }
-    } finally {
-      ai.running = false;
-      render({});
-    }
-  }
+  const list = () => base;
 
   async function save() {
     const picks = list().filter((c) => checked.has(c.key));
@@ -192,7 +139,6 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
             typedCourse = "";
           } else courseChoice = e.target.value;
           base = [];
-          refined = null;
           refresh();
         } },
       ...courses.map((c) => el("option", { value: c.id, selected: c.id === courseChoice }, c.name)),
@@ -207,25 +153,10 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
         onchange: (e) => {
           typedCourse = e.target.value.trim();
           base = [];
-          refined = null;
           refresh();
         },
       });
     const head = el("div", { class: "sg-head" }, el("label", { class: "sg-course" }, el("span", {}, "For"), select), nameInput);
-
-    // AI status line
-    let aiLine = null;
-    if (ai.running)
-      aiLine = el("div", { class: "sg-ai busy" }, el("span", { class: "spark", innerHTML: SPARK }), ai.progress && ai.progress < 1 ? `Ranking with on-device AI… ${Math.round(ai.progress * 100)}%` : "Ranking with on-device AI…");
-    else if (refined) aiLine = el("div", { class: "sg-ai" }, el("span", { class: "spark", innerHTML: SPARK }), "Ranked with on-device AI");
-    else if (ai.status === "downloadable" || ai.status === "downloading")
-      aiLine = el(
-        "button",
-        { class: "sg-ai cta", onclick: () => currentCourse().then(({ name }) => runAI({ name, subject: subjectFor(name) })) },
-        el("span", { class: "spark", innerHTML: SPARK }),
-        "Rank with on-device AI (one-time download)",
-      );
-    if (ai.error) aiLine = el("div", { class: "sg-ai muted" }, ai.error);
 
     if (!items.length) {
       pane.replaceChildren(
@@ -252,7 +183,7 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
           footerBtn.disabled = !checked.size;
         },
       });
-      const src = c.defSource ? el("span", { class: `src${c.defSource.label === "On-device AI" ? " ai" : ""}`, title: c.defSource.detail || "" }, c.defSource.label) : null;
+      const src = c.defSource ? el("span", { class: "src", title: c.defSource.detail || "" }, c.defSource.label) : null;
       return el(
         "label",
         { class: "sg-row" },
@@ -294,7 +225,6 @@ export function createSuggestions({ pane, onCount, getText, getDoc, goToPage, to
 
     pane.replaceChildren(
       head,
-      aiLine,
       el("div", { class: "sg-list" }, ...rows, items.length > shown.length && el("button", { class: "sg-more", onclick: () => ((showAll = true), render({})) }, `Show ${items.length - shown.length} more`)),
       footer,
     );
