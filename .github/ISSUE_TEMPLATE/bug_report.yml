@@ -1,0 +1,27 @@
+name: Bug report
+description: Something in Margin isn't working
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened?
+      description: What did you do, what did you expect, and what happened instead? Screenshots help a lot.
+    validations:
+      required: true
+  - type: input
+    id: where
+    attributes:
+      label: Where
+      description: The kind of page (e.g. Canvas page, a PDF in Margin's viewer, a course website). Please don't paste private links.
+  - type: input
+    id: version
+    attributes:
+      label: Margin and Chrome versions
+      placeholder: Margin 0.1.0, Chrome 157
+  - type: textarea
+    id: errors
+    attributes:
+      label: Errors
+      description: Anything listed under Errors on Margin's card in chrome://extensions.
+      render: text

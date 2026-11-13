@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Margin PDF</title>
+    <link rel="icon" href="../../icons/icon-32.png" />
+    <link rel="stylesheet" href="../../vendor/pdfjs/web/pdf_viewer.css" />
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="viewer.css" />
+  </head>
+  <body>
+    <header class="bar">
+      <a class="brand" href="../hub/hub.html" title="Open your glossary">
+        <span class="logo" aria-hidden="true"></span>
+        <span class="brand-name">Margin</span>
+      </a>
+      <div class="doc" id="docTitle" title=""></div>
+
+      <div class="controls" id="controls" hidden>
+        <button class="btn icon ghost" id="prevPage" title="Previous page">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M10 3.5 5.5 8l4.5 4.5" /></svg>
+        </button>
+        <label class="pager">
+          <input id="pageInput" inputmode="numeric" aria-label="Page number" />
+          <span class="faint">/</span>
+          <span id="pageCount" class="faint">0</span>
+        </label>
+        <button class="btn icon ghost" id="nextPage" title="Next page">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 3.5 4.5 4.5L6 12.5" /></svg>
+        </button>
+        <span class="sep"></span>
+        <button class="btn icon ghost" id="zoomOut" title="Zoom out (−)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M4 8h8" /></svg>
+        </button>
+        <button class="btn ghost zoom" id="zoomLabel" title="Fit to width">100%</button>
+        <button class="btn icon ghost" id="zoomIn" title="Zoom in (+)">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M8 4v8M4 8h8" /></svg>
+        </button>
+      </div>
+
+      <div class="right">
+        <button class="btn icon ghost" id="darkPages" title="Dark pages">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M13.2 9.6A5.5 5.5 0 0 1 6.4 2.8a5.5 5.5 0 1 0 6.8 6.8Z" /></svg>
+        </button>
+        <button class="btn" id="openFile">
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"><path d="M2.5 4.5a1 1 0 0 1 1-1h3l1.5 1.5h4.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-9a1 1 0 0 1-1-1v-7.5Z" /></svg>
+          Open PDF
+        </button>
+        <button class="btn" id="toggleSide" aria-pressed="true" hidden>
+          <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="3" width="12" height="10" rx="1.5" /><path d="M10 3v10" /></svg>
+          Terms <span class="count" id="termCount">0</span>
+        </button>
+      </div>
+    </header>
+
+    <main class="stage">
+      <div id="viewerContainer" hidden>
+        <div id="viewer" class="pdfViewer"></div>
+      </div>
+
+      <aside class="side" id="side" hidden>
+        <div class="side-head">
+          <h2>In this PDF</h2>
+          <span class="faint" id="sideMeta"></span>
+        </div>
+        <div class="side-body" id="sideList"></div>
+      </aside>
+
+      <section class="empty" id="emptyState" hidden>
+        <div class="drop" id="dropZone">
+          <div class="drop-art" aria-hidden="true">
+            <span></span><span></span><span class="m"></span><span></span>
+          </div>
+          <h1>Open a lecture PDF</h1>
+          <p class="muted">Drop a file here, or choose one from your Mac. Terms you've saved get underlined, and you can save new ones as you read.</p>
+          <div class="drop-actions">
+            <button class="btn primary" id="pickFile">Choose PDF…</button>
+          </div>
+          <p class="faint small">Tip: set Chrome as the default app for PDFs and they'll open here with a double-click.</p>
+        </div>
+        <div class="recent" id="recentWrap" hidden>
+          <h3>Recent</h3>
+          <ul id="recentList"></ul>
+        </div>
+      </section>
+
+      <section class="empty" id="messageState" hidden>
+        <div class="message">
+          <h1 id="messageTitle"></h1>
+          <p class="muted" id="messageBody"></p>
+          <div class="drop-actions" id="messageActions"></div>
+        </div>
+      </section>
+
+      <div class="dropping" id="dropOverlay" hidden><span>Drop to open</span></div>
+    </main>
+
+    <script type="module" src="viewer.js"></script>
+  </body>
+</html>

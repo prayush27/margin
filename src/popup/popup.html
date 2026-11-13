@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Margin</title>
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header>
+      <span class="logo" aria-hidden="true"></span>
+      <span class="name">Margin</span>
+      <a class="btn ghost icon" id="settings" href="../hub/hub.html#settings" target="_blank" title="Settings" aria-label="Settings">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="8" cy="8" r="2" /><path d="M8 1.75v1.5M8 12.75v1.5M14.25 8h-1.5M3.25 8h-1.5M12.4 3.6l-1.06 1.06M4.66 11.34 3.6 12.4M12.4 12.4l-1.06-1.06M4.66 4.66 3.6 3.6" stroke-linecap="round" /></svg>
+      </a>
+    </header>
+
+    <section class="site" id="siteRow">
+      <div class="grow">
+        <div class="t" id="siteTitle">On this site</div>
+        <div class="s" id="siteHost"></div>
+      </div>
+      <label class="switch"><input type="checkbox" id="siteToggle" /><span></span></label>
+    </section>
+
+    <section class="block">
+      <label class="label" for="courseSelect">Underline terms from</label>
+      <select class="select" id="courseSelect"></select>
+    </section>
+
+    <section class="stats" id="stats"></section>
+
+    <section class="actions">
+      <a class="btn primary" href="../hub/hub.html" target="_blank">Open glossary</a>
+      <a class="btn" id="quizLink" href="../hub/hub.html#quiz" target="_blank">Quiz me</a>
+      <a class="btn" href="../viewer/viewer.html" target="_blank">Open a PDF</a>
+    </section>
+
+    <footer>Select text and press <kbd id="shortcut">⌥⇧S</kbd> to save a term</footer>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

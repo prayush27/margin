@@ -1,0 +1,15 @@
+name: Idea
+description: Suggest something that would make studying with Margin better
+labels: [idea]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: What are you trying to do?
+      description: Describe the study moment, e.g. "reviewing lecture slides the night before an exam".
+    validations:
+      required: true
+  - type: textarea
+    id: idea
+    attributes:
+      label: What would help?

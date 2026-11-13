@@ -1,0 +1,81 @@
+import * as store from "../shared/storage.js";
+
+const $ = (id) => document.getElementById(id);
+const { terms, courses, settings } = await store.getAll();
+
+// Current site
+const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+let host = "";
+let canRun = false;
+try {
+  const u = new URL(tab?.url || "");
+  host = u.hostname;
+  canRun = /^https?:$/.test(u.protocol) && host !== "chromewebstore.google.com";
+  if (u.href.startsWith(chrome.runtime.getURL(""))) {
+    $("siteTitle").textContent = "Margin page";
+    $("siteHost").textContent = "Always on here";
+  }
+} catch {}
+
+const toggle = $("siteToggle");
+if (canRun) {
+  $("siteHost").textContent = host;
+  if (host === "docs.google.com") {
+    toggle.checked = false;
+    toggle.disabled = true;
+    $("siteHost").textContent = "Google Docs isn't supported yet";
+  } else {
+    toggle.checked = settings.enabled && !settings.disabledHosts.includes(host);
+    toggle.disabled = !settings.enabled;
+    if (!settings.enabled) $("siteHost").textContent = "Margin is off everywhere (Settings)";
+  }
+} else if (tab?.url?.startsWith(chrome.runtime.getURL(""))) {
+  toggle.checked = true;
+  toggle.disabled = true;
+} else {
+  $("siteHost").textContent = "Margin can't run on this page";
+  toggle.disabled = true;
+}
+$("siteRow").classList.toggle("disabled", toggle.disabled);
+
+toggle.addEventListener("change", async () => {
+  const s = await store.getSettings();
+  const set = new Set(s.disabledHosts);
+  if (toggle.checked) set.delete(host);
+  else set.add(host);
+  await store.updateSettings({ disabledHosts: [...set] });
+});
+
+// Course scope
+const select = $("courseSelect");
+const counts = new Map();
+for (const t of terms) counts.set(t.courseId, (counts.get(t.courseId) || 0) + 1);
+select.append(new Option(`All courses (${terms.length})`, "all"));
+for (const c of courses) select.append(new Option(`${c.name} (${counts.get(c.id) || 0})`, c.id));
+select.value = courses.some((c) => c.id === settings.activeCourse) ? settings.activeCourse : "all";
+select.addEventListener("change", async () => {
+  await store.updateSettings({ activeCourse: select.value });
+  $("quizLink").href = `../hub/hub.html#quiz${select.value !== "all" ? `=${select.value}` : ""}`;
+});
+if (select.value !== "all") $("quizLink").href = `../hub/hub.html#quiz=${select.value}`;
+
+// Stats
+const weekAgo = Date.now() - 7 * 86400000;
+const thisWeek = terms.filter((t) => t.createdAt > weekAgo).length;
+const stat = (n, label) => {
+  const d = document.createElement("div");
+  d.className = "stat";
+  const b = document.createElement("b");
+  b.textContent = n;
+  const s = document.createElement("span");
+  s.textContent = label;
+  d.append(b, s);
+  return d;
+};
+$("stats").append(stat(terms.length, terms.length === 1 ? "term saved" : "terms saved"), stat(thisWeek, "added this week"));
+
+// Shortcut label
+chrome.commands.getAll().then((cmds) => {
+  const c = cmds.find((x) => x.name === "save-term");
+  if (c?.shortcut) $("shortcut").textContent = c.shortcut;
+});
