@@ -53,4 +53,4 @@ python3 tools/build_nist.py       # NIST DADS -> data/nist-dads.json
 
 ## Releasing
 
-Bump `version` in `manifest.json`, then tag it: `git tag v0.2.0 && git push --tags`. The release workflow builds the zip and attaches it to a GitHub release.
+Margin is distributed only through the Chrome Web Store. To prepare an update, bump `version` in `manifest.json` and run `./tools/package.sh` to build the zip for the Web Store dashboard.

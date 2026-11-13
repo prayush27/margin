@@ -14,7 +14,7 @@ Save a term once and see its definition on every page and lecture PDF.
 ![No tracking](https://img.shields.io/badge/tracking-none-22a06b)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-1d1d1f)
 
-[Install](#install) · [Features](#features) · [Where definitions come from](#where-definitions-come-from) · [Privacy](#privacy) · [How it works](#how-it-works) · [Contributing](CONTRIBUTING.md)
+[Features](#features) · [Where definitions come from](#where-definitions-come-from) · [Privacy](#privacy) · [How it works](#how-it-works) · [Contributing](CONTRIBUTING.md)
 
 <br>
 
@@ -96,22 +96,7 @@ Every suggestion is labelled with its source and links back to it. Licenses and 
 
 ## Install
 
-> **Chrome Web Store:** coming soon.
-
-**From a release (no git needed)**
-
-1. Download `margin-x.y.z.zip` from the [latest release](https://github.com/prayush27/margin/releases/latest) and unzip it.
-2. Open `chrome://extensions`, turn on **Developer mode**, click **Load unpacked**, and choose the unzipped folder.
-
-**From source**
-
-```sh
-git clone https://github.com/prayush27/margin.git
-```
-
-Then load the `margin` folder with **Load unpacked** as above.
-
-**For PDFs on your Mac:** on Margin's card in `chrome://extensions`, click **Details** and turn on **Allow access to file URLs**. To make Chrome your PDF app, right-click any PDF in Finder → **Get Info** → **Open with: Google Chrome** → **Change All**.
+Margin is coming soon to the **Chrome Web Store**, which will be the only official place to get it.
 
 ### Keyboard shortcuts
 
@@ -177,7 +162,7 @@ No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaS
 - [x] **Find one**: subject-aware definitions from textbooks, field references and encyclopedias
 - [ ] Lecture videos: catch terms in captions, with “explained at 34:12” timestamps
 - [ ] Optional on-device definition drafting with Chrome's built-in AI
-- [ ] Chrome Web Store release
+- [ ] Chrome Web Store release (the only official download)
 - [ ] Firefox and Edge
 
 Have an idea? [Open an issue](https://github.com/prayush27/margin/issues/new/choose).
