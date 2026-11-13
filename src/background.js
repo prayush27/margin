@@ -88,6 +88,7 @@ function header(details, name) {
   return details.responseHeaders?.find((h) => h.name.toLowerCase() === name)?.value || "";
 }
 
+// Web PDFs from course sites. Only acts when you've turned on "Open PDFs in Margin".
 chrome.webRequest.onHeadersReceived.addListener(
   (details) => {
     if (details.tabId < 0 || details.method !== "GET") return;
@@ -104,13 +105,11 @@ chrome.webRequest.onHeadersReceived.addListener(
   ["responseHeaders"],
 );
 
-// Local PDFs opened in Chrome (file:///...). Needs "Allow access to file URLs" for Margin.
-chrome.webNavigation.onBeforeNavigate.addListener(
-  async (details) => {
-    if (details.frameId !== 0) return;
-    const settings = await getSettings();
-    if (!settings.openPdfs || (await shouldBypass(details.url))) return;
-    chrome.tabs.update(details.tabId, { url: viewerUrl({ file: details.url }) });
-  },
-  { url: [{ schemes: ["file"], pathSuffix: ".pdf" }, { schemes: ["file"], pathSuffix: ".PDF" }] },
-);
+// Local PDFs opened in Chrome (file:///...). Needs "Allow access to file URLs" for Margin;
+// the host permission lets Margin see the tab's URL, so no browsing-history permission is needed.
+chrome.tabs.onUpdated.addListener(async (tabId, change) => {
+  if (!change.url || !/^file:\/\/.*\.pdf$/i.test(change.url)) return;
+  const settings = await getSettings();
+  if (!settings.openPdfs || (await shouldBypass(change.url))) return;
+  chrome.tabs.update(tabId, { url: viewerUrl({ file: change.url }) });
+});

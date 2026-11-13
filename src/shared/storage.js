@@ -11,7 +11,8 @@ export const DEFAULT_SETTINGS = {
   disabledHosts: [],
   underline: "all", // "all" | "first"
   selectionPill: true,
-  openPdfs: true,
+  openPdfs: false, // opt-in: PDFs open in Chrome's viewer until you say yes
+  pdfAsked: false,
   activeCourse: "all",
   lastCourse: null,
   darkPdf: false,

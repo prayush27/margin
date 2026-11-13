@@ -2,6 +2,7 @@ import * as store from "../shared/storage.js";
 import { attachStudyLayer } from "../shared/study-layer.js";
 import { SHORTCUT_LABEL, sourceLabel } from "../shared/ui.js";
 import { listRecent, removeRecent, touchRecent, viewerUrl } from "../shared/recent.js";
+import { setOpenPdfs } from "../shared/pdfs.js";
 
 const $ = (id) => document.getElementById(id);
 const main = $("main");
@@ -319,7 +320,7 @@ function renderWelcome() {
     "section",
     { class: "welcome" },
     h("h2", {}, "Every term, in the margin."),
-    h("p", {}, "Save a term once. See its definition everywhere you study: lecture PDFs, Canvas, course sites, AI chats."),
+    h("p", {}, "Save a term once. See its definition wherever you study: lecture PDFs, Canvas and course sites."),
     h(
       "div",
       { class: "steps" },
@@ -335,7 +336,7 @@ function renderWelcome() {
         { class: "step" },
         h("span", { class: "num" }, "2"),
         h("h4", {}, "Hover to recall"),
-        h("p", {}, "Saved terms get a soft underline wherever they show up. Hover one to see your definition."),
+        h("p", {}, "Saved terms get a soft underline on your course sites and PDFs. Hover one to see your definition."),
       ),
       h(
         "div",
@@ -355,6 +356,23 @@ function renderWelcome() {
         "A stack is a collection where the last item added is the first one removed. Undo history in a text editor behaves like a stack.",
       ),
     ),
+    !data.settings.pdfAsked &&
+      h(
+        "div",
+        { class: "ask" },
+        h(
+          "div",
+          { class: "grow" },
+          h("h4", {}, "Open lecture PDFs in Margin?"),
+          h("p", {}, "PDFs you open in Chrome will switch to Margin's viewer, with your terms underlined and a list of every term in the file. You can change this anytime in Settings."),
+        ),
+        h(
+          "div",
+          { class: "ask-actions" },
+          h("button", { class: "btn primary", onclick: async () => (await setOpenPdfs(true), toast("PDFs will open in Margin.")) }, "Yes, open them in Margin"),
+          h("button", { class: "btn ghost", onclick: () => setOpenPdfs(false) }, "Not now"),
+        ),
+      ),
     h(
       "div",
       { class: "foot" },
@@ -834,6 +852,15 @@ function toggle(key, { invert = false, value } = {}) {
   return h("label", { class: "switch" }, input, h("span"));
 }
 
+function pdfToggle() {
+  const input = h("input", { type: "checkbox" });
+  input.checked = !!data.settings.openPdfs;
+  input.addEventListener("change", async () => {
+    await setOpenPdfs(input.checked);
+  });
+  return h("label", { class: "switch" }, input, h("span"));
+}
+
 function settingRow(title, desc, control) {
   return h("div", { class: "setting" }, h("div", { class: "grow" }, h("div", { class: "t" }, title), desc && h("div", { class: "s" }, desc)), control);
 }
@@ -866,7 +893,7 @@ function renderSettings() {
       ),
       settingRow("Only the first time per page", "Underline each term once per page instead of every time it appears. Less busy on long readings.", h("label", { class: "switch" }, underlineFirst, h("span"))),
       settingRow("Show “Save term” when selecting text", `A small button appears next to short selections. The ${SHORTCUT_LABEL} shortcut always works.`, toggle("selectionPill")),
-      settingRow("Open PDFs in Margin", "Web PDFs you open in Chrome switch to Margin's viewer automatically.", toggle("openPdfs")),
+      settingRow("Open PDFs in Margin", "Lecture PDFs you open in Chrome switch to Margin's viewer, with your terms underlined.", pdfToggle()),
     ),
   );
 

@@ -53,7 +53,7 @@ Saved terms get a soft amber underline on your course sites (Canvas, .edu pages,
 <td width="50%" valign="top">
 
 ### Built for lecture PDFs
-Lecture PDFs (from the web or your Mac) open in Margin's own PDF.js viewer, with underlines, hover cards, a **Terms in this PDF** panel with page links, and dark pages for late-night reading.
+Say yes once and lecture PDFs (from the web or your Mac) open in Margin's own PDF.js viewer, with underlines, hover cards, a **Terms in this PDF** panel with page links, and dark pages for late-night reading.
 
 </td>
 <td width="50%" valign="top">

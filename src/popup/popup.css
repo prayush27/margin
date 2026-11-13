@@ -149,3 +149,44 @@ footer {
 .switch input:disabled + span {
   opacity: 0.5;
 }
+
+.site[hidden] {
+  display: none;
+}
+.pdf-row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: var(--r-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.pdf-row[hidden] {
+  display: none;
+}
+.pdf-row .grow {
+  flex: 1;
+  min-width: 0;
+}
+.pdf-row .t {
+  font-size: var(--fs-14);
+  font-weight: 600;
+}
+.pdf-row .s {
+  font-size: var(--fs-12);
+  color: var(--text-3);
+}
+.pdf-row .always {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 8px;
+  font-size: var(--fs-12);
+  color: var(--text-2);
+  cursor: pointer;
+}
+.pdf-row .btn {
+  justify-content: center;
+}

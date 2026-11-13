@@ -1,5 +1,7 @@
 import * as store from "../shared/storage.js";
 import { siteActive, isStudySite, setSiteOn, BLOCKED_HOSTS } from "../shared/sites.js";
+import { looksLikePdf, setOpenPdfs } from "../shared/pdfs.js";
+import { viewerUrl } from "../shared/recent.js";
 
 const $ = (id) => document.getElementById(id);
 const { terms, courses, settings } = await store.getAll();
@@ -51,6 +53,21 @@ toggle.addEventListener("change", async () => {
   const s = await store.updateSettings(setSiteOn(await store.getSettings(), host, toggle.checked));
   $("siteHost").textContent = describeSite(s);
 });
+
+// A PDF in Chrome's own viewer: offer to open it in Margin (and to always do that).
+if (tab?.id && looksLikePdf(tab.url) && !tab.url.startsWith(chrome.runtime.getURL(""))) {
+  $("pdfRow").hidden = false;
+  $("siteRow").hidden = true; // Chrome's PDF viewer doesn't run extensions, so the site switch does nothing here
+  $("openPdfHere").addEventListener("click", async () => {
+    await chrome.tabs.update(tab.id, { url: viewerUrl({ file: tab.url }) });
+    window.close();
+  });
+  const always = $("alwaysPdf");
+  always.checked = !!settings.openPdfs;
+  always.addEventListener("change", async () => {
+    await setOpenPdfs(always.checked);
+  });
+}
 
 // Course scope
 const select = $("courseSelect");
