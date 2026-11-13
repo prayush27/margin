@@ -61,10 +61,14 @@
 
       <aside class="side" id="side" hidden>
         <div class="side-head">
-          <h2>In this PDF</h2>
+          <div class="side-tabs" role="tablist" aria-label="Side panel">
+            <button role="tab" id="tabSaved" aria-selected="true" aria-controls="sideList">In this PDF</button>
+            <button role="tab" id="tabSuggest" aria-selected="false" aria-controls="suggestPane">Suggested <span class="badge" id="suggestCount" hidden></span></button>
+          </div>
           <span class="faint" id="sideMeta"></span>
         </div>
-        <div class="side-body" id="sideList"></div>
+        <div class="side-body" id="sideList" role="tabpanel"></div>
+        <div class="side-body suggest" id="suggestPane" role="tabpanel" hidden></div>
       </aside>
 
       <section class="empty" id="emptyState" hidden>

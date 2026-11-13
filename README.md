@@ -53,7 +53,7 @@ Saved terms get a soft amber underline on your course sites (Canvas, .edu pages,
 <td width="50%" valign="top">
 
 ### Built for lecture PDFs
-Say yes once and lecture PDFs (from the web or your Mac) open in Margin's own PDF.js viewer, with underlines, hover cards, a **Terms in this PDF** panel with page links, and dark pages for late-night reading.
+Say yes once and lecture PDFs (from the web or your Mac) open in Margin's own PDF.js viewer, with underlines, hover cards, a **Terms in this PDF** panel with page links, and dark pages for late-night reading. The **Suggested** tab finds the lecture's key terms for you, with definitions from your professor's slides or the course's textbooks, ready to save in one click.
 
 </td>
 <td width="50%" valign="top">
@@ -144,6 +144,7 @@ A few details:
 - **Fast matching.** The glossary compiles into two regular expressions (one case-sensitive, for acronyms like “OS”) that find every term, plural and alias in a single pass, longest match first. A `MutationObserver` catches content that loads later, and text boxes and editors are skipped.
 - **PDFs are first-class.** A `webRequest` listener spots PDF responses and opens them in Margin's PDF.js viewer, where the same highlighter runs on the text layer.
 - **Smart suggestions.** `lookup.js` maps course codes to subjects, queries the right sources in parallel with timeouts, ranks results by how well they fit the course, and caches answers.
+- **Key-term finder.** `keyterms.js` scores every candidate in a lecture with four signals: matches in the course's textbook glossaries, definitions written on the slides ("A heap is…", "Load factor: …"), how rare the phrase is in everyday English ([wordfreq](https://github.com/rspeer/wordfreq) frequencies), and emphasis (repeats, pages, slide titles). When Chrome's on-device model is available, `ai.js` re-ranks the top candidates and drafts missing definitions, labelled as AI drafts.
 - **Zero dependencies, no build step.** Plain ES modules. Clone it, load it, edit it.
 
 ## Development
@@ -160,8 +161,9 @@ No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaS
 
 - [x] Hover definitions on any page, PDF viewer, glossary, quiz
 - [x] **Find one**: subject-aware definitions from textbooks, field references and encyclopedias
+- [x] **Suggested terms** in lecture PDFs: glossary matches, slide definitions and word-rarity scoring, optionally re-ranked by Chrome's on-device AI
 - [ ] Lecture videos: catch terms in captions, with “explained at 34:12” timestamps
-- [ ] Optional on-device definition drafting with Chrome's built-in AI
+- [ ] Suggested terms on course web pages, not just PDFs
 - [ ] Chrome Web Store release (the only official download)
 - [ ] Firefox and Edge
 

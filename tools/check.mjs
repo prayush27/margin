@@ -60,6 +60,8 @@ for (const name of readdirSync(join(root, "data/openstax")).filter((n) => n !== 
 }
 const dads = JSON.parse(readFileSync(join(root, "data/nist-dads.json"), "utf8"));
 if (Object.keys(dads).length < 500) problems.push("data/nist-dads.json looks empty");
+const zipf = JSON.parse(readFileSync(join(root, "data/english-zipf.json"), "utf8"));
+if (!(zipf.the > 70) || Object.keys(zipf).length < 10000) problems.push("data/english-zipf.json looks wrong");
 
 if (problems.length) {
   console.error(problems.map((p) => `✗ ${p}`).join("\n"));

@@ -1,9 +1,10 @@
-// Unit tests for Margin's pure logic: term matching, definition guessing, subject detection, study sites.
+// Unit tests for Margin's pure logic: term matching, definition guessing, subject detection, study sites, key terms.
 // No dependencies. Run with Node (`node tests/run.mjs`) or macOS JavaScriptCore (`jsc -m tests/run.mjs`).
 import { buildMatcher } from "../src/shared/matcher.js";
 import { guessDefinition, sentenceAround } from "../src/shared/extract.js";
 import { subjectFor } from "../src/shared/lookup.js";
 import { isStudySite, siteActive, setSiteOn } from "../src/shared/sites.js";
+import { findKeyTerms, cleanText } from "../src/shared/keyterms.js";
 
 const log = globalThis.print ?? console.log;
 let passed = 0;
@@ -73,6 +74,28 @@ eq("turning it off again", [siteActive(off, "blog.example.com"), off.allowedHost
 const paused = { ...S, ...setSiteOn(S, "canvas.wisc.edu", false) };
 eq("pausing a study site", siteActive(paused, "canvas.wisc.edu"), false);
 eq("resuming it", siteActive({ ...paused, ...setSiteOn(paused, "canvas.wisc.edu", true) }, "canvas.wisc.edu"), true);
+
+log("key terms");
+const zipfMini = { the: 77, people: 62, set: 56, data: 53, array: 41, tree: 48, node: 39, key: 51, element: 46, insert: 37, sorted: 40, time: 63, week: 58, homework: 44, due: 51, friday: 49, heap: 36, queue: 38, priority: 46 };
+const gl = [
+  { term: "heap", text: "A tree with the heap property.", source: { label: "NIST" } },
+  { term: "set", text: "An unordered collection.", source: { label: "NIST" } },
+  { term: "binary search tree", text: "A binary tree where left < node < right.", source: { label: "NIST" } },
+];
+const lecture = [
+  "Lecture 9: Heaps\nCS 400",
+  "Heaps\nA heap is a complete binary tree in which every node's key is greater than or equal to the\nkeys of its children.\nWe set the root first.",
+  "Using heaps\nCall removeMax() to take the top. removeMax runs in O(log n).\nUnsorted array: insert O(1), removeMax O(n).",
+  "Balancing\nAmortized analysis averages the cost over many operations. Amortized analysis matters for dynamic arrays.\nHomework due Friday.",
+];
+const kt = findKeyTerms({ pages: lecture, glossary: gl, zipf: zipfMini, saved: [{ term: "binary search tree" }], docTitle: "Lecture 9: Heaps" });
+const byTerm = Object.fromEntries(kt.map((k) => [k.term, k]));
+eq("finds the lecture's main term first", kt[0]?.term, "heap");
+eq("uses the professor's definition, even across a line break", byTerm.heap?.definition, "A complete binary tree in which every node's key is greater than or equal to the keys of its children.");
+eq("counts plurals with the term", byTerm.heap?.count >= 3, true);
+eq("finds unglossaried phrases that repeat", !!byTerm["amortized analysis"], true);
+eq("skips everyday glossary words, saved terms, code and notes", ["set", "binary search tree", "removeMax", "Unsorted array", "homework"].filter((t) => byTerm[t]), []);
+eq("joins PDF ligatures", cleanText("signi\uFB01cance"), "significance");
 
 log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) throw new Error(`${failures.length} test(s) failed: ${failures.join(", ")}`);

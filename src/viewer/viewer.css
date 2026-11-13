@@ -199,12 +199,48 @@ body.dark-pages .pdfViewer .page .canvasWrapper {
   gap: 8px;
   padding: 18px 18px 10px;
 }
-.side-head h2 {
-  margin: 0;
-  font-family: var(--font-serif);
-  font-size: var(--fs-20);
-  font-weight: 600;
-  letter-spacing: -0.01em;
+.side-head {
+  align-items: center;
+}
+.side-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--surface-2);
+}
+.side-tabs button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 11px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--text-2);
+  font: 600 var(--fs-13) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.side-tabs button[aria-selected="true"] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+}
+.side-tabs .badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 9px;
+  background: var(--mark-soft);
+  color: var(--accent);
+  font-size: 11px;
+  line-height: 18px;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.side-tabs .badge[hidden] {
+  display: none;
 }
 .side-head .faint {
   margin-left: auto;
@@ -289,6 +325,176 @@ body.dark-pages .pdfViewer .page .canvasWrapper {
 }
 .side-empty strong {
   color: var(--text);
+}
+/* Suggested tab */
+.side-body[hidden] {
+  display: none;
+}
+.side-body.suggest {
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 0;
+}
+.sg-head {
+  display: grid;
+  gap: 6px;
+  padding: 2px 8px 8px;
+}
+.sg-course {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--fs-13);
+  color: var(--text-2);
+}
+.sg-course .select {
+  flex: 1;
+  min-width: 0;
+  height: 30px;
+}
+.sg-head .input {
+  height: 30px;
+}
+.sg-ai {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 8px 6px;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: 500 var(--fs-12) / 1.3 var(--font-ui);
+  color: var(--text-3);
+  text-align: left;
+}
+.sg-ai .spark svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  color: var(--mark);
+}
+.sg-ai.busy .spark svg {
+  animation: sg-pulse 1.2s ease-in-out infinite;
+}
+.sg-ai.cta {
+  color: var(--accent);
+  cursor: pointer;
+}
+.sg-ai.cta:hover {
+  text-decoration: underline;
+}
+@keyframes sg-pulse {
+  50% {
+    opacity: 0.35;
+  }
+}
+.sg-list {
+  flex: 1;
+  overflow: auto;
+  min-height: 0;
+}
+.sg-row {
+  display: flex;
+  gap: 10px;
+  padding: 9px 8px 10px;
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+.sg-row:hover {
+  background: var(--hover);
+}
+.sg-row input {
+  flex: none;
+  margin: 4px 0 0;
+  accent-color: var(--mark);
+  width: 15px;
+  height: 15px;
+}
+.sg-row .grow {
+  flex: 1;
+  min-width: 0;
+}
+.sg-row .t {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.sg-row .term {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: var(--fs-17);
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-align: left;
+  cursor: pointer;
+}
+.sg-row .term:hover {
+  text-decoration: underline dotted var(--mark);
+  text-underline-offset: 3px;
+}
+.sg-row .n {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-3);
+  font-variant-numeric: tabular-nums;
+}
+.sg-row .d {
+  margin: 2px 0 0;
+  font-size: var(--fs-13);
+  line-height: 1.45;
+  color: var(--text-2);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sg-row .d.none {
+  font-style: italic;
+  color: var(--text-3);
+}
+.sg-row .meta {
+  margin-top: 5px;
+}
+.sg-row .src {
+  display: inline-block;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: var(--surface-2);
+  color: var(--text-2);
+  font-size: 11px;
+  font-weight: 600;
+}
+.sg-row .src.ai {
+  background: var(--mark-soft);
+  color: var(--accent);
+}
+.sg-more {
+  display: block;
+  margin: 4px 8px 10px;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: 600 var(--fs-13) / 1 var(--font-ui);
+  cursor: pointer;
+}
+.sg-foot {
+  display: flex;
+  gap: 8px;
+  padding: 10px 8px 14px;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+.sg-foot .btn.primary {
+  flex: 1;
+  justify-content: center;
+}
+.sg-foot .btn.primary:disabled {
+  opacity: 0.45;
+  cursor: default;
 }
 .scanning {
   padding: 4px 10px 10px;

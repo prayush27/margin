@@ -7,6 +7,7 @@ Margin's **Find one** tab suggests definitions from these sources. Each suggesti
 | Source | What | License | Rebuild |
 | --- | --- | --- | --- |
 | [OpenStax](https://openstax.org) glossaries | Key terms from 64 free college textbooks (psychology, biology, chemistry, economics, statistics, nursing, …) | CC BY 4.0 or CC BY-NC-SA 4.0 per book, listed in `openstax/books.json`. Margin is free and non-commercial. | `python3 tools/build_openstax.py` |
+| [wordfreq](https://github.com/rspeer/wordfreq) by Robyn Speer | How common ~29,000 English words are, used by **Terms on this page** to tell course vocabulary from everyday words (`english-zipf.json`) | CC BY-SA 4.0 | `pip install wordfreq && python3 tools/build_wordfreq.py` |
 | [NIST Dictionary of Algorithms and Data Structures](https://xlinux.nist.gov/dads/) | 835 computer science definitions | Public domain (US government work). Entries copyrighted by CRC Press are skipped. | `python3 tools/build_nist.py` |
 
 OpenStax is a trademark of Rice University. Margin is not affiliated with or endorsed by OpenStax or NIST.

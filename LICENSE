@@ -28,5 +28,6 @@ This license covers Margin's own code. Bundled third-party material keeps its ow
 - fonts/               Newsreader, SIL Open Font License 1.1 (fonts/OFL.txt)
 - data/openstax/       OpenStax textbook glossaries, CC BY 4.0 or CC BY-NC-SA 4.0 per book
 - data/nist-dads.json  NIST Dictionary of Algorithms and Data Structures, public domain
+- data/english-zipf.json  word frequencies from wordfreq by Robyn Speer, CC BY-SA 4.0
 
 See data/SOURCES.md for details and attribution.

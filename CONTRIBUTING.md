@@ -49,6 +49,7 @@ CI runs both on every push and pull request.
 ```sh
 python3 tools/build_openstax.py   # OpenStax glossaries -> data/openstax/
 python3 tools/build_nist.py       # NIST DADS -> data/nist-dads.json
+python3 tools/build_wordfreq.py   # word frequencies -> data/english-zipf.json (pip install wordfreq)
 ```
 
 ## Releasing

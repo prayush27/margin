@@ -2,6 +2,7 @@ import * as store from "../shared/storage.js";
 import { buildMatcher } from "../shared/matcher.js";
 import { attachStudyLayer } from "../shared/study-layer.js";
 import { listRecent, getRecent, touchRecent, viewerUrl } from "../shared/recent.js";
+import { createSuggestions } from "./suggest.js";
 
 const $ = (id) => document.getElementById(id);
 const PDFJS = "../../vendor/pdfjs/";
@@ -18,6 +19,8 @@ let pdfDoc = null;
 let docInfo = { url: null, name: "" };
 let pageTexts = [];
 let layer = null;
+let suggestions = null;
+let sideTab = "saved";
 
 // ---------------- Boot ----------------
 (async function boot() {
@@ -178,8 +181,21 @@ async function openDocument(source, info) {
         return { url: docInfo.url, title: docInfo.title || docInfo.name, page };
       },
     });
+    suggestions = createSuggestions({
+      pane: $("suggestPane"),
+      onCount: (n) => {
+        $("suggestCount").hidden = !n;
+        $("suggestCount").textContent = n || "";
+      },
+      getText: () => ({ pages: pageTexts, done: !!pdfDoc && pageTexts.filter((t) => t !== undefined).length >= pdfDoc.numPages, total: pdfDoc?.numPages || 0 }),
+      getDoc: () => ({ url: docInfo.url, title: docInfo.title || docInfo.name, name: docInfo.name }),
+      goToPage: (n) => (viewer.currentPageNumber = n),
+      toast: (msg, action) => layer.overlay.toast(msg, action),
+    });
+    wireSideTabs();
     store.onChange((changes) => {
       if (changes.terms || changes.settings) renderSide();
+      if (changes.terms || changes.courses) suggestions.refresh();
     });
   }
 
@@ -187,6 +203,9 @@ async function openDocument(source, info) {
   setSide(settings.sideOpen !== false);
   pageTexts = [];
   renderSide(true);
+  suggestions.refresh({ newDoc: true });
+  // New to Margin? Start on the suggestions instead of an empty list.
+  setSideTab((await store.getAll()).terms.length ? "saved" : "suggest");
   extractText();
 }
 
@@ -197,12 +216,54 @@ async function extractText() {
     try {
       const page = await doc.getPage(i);
       const content = await page.getTextContent();
-      pageTexts[i - 1] = content.items.map((it) => (it.str || "") + (it.hasEOL ? "\n" : " ")).join("");
+      pageTexts[i - 1] = joinTextItems(content.items);
     } catch {
       pageTexts[i - 1] = "";
     }
-    if (i % 8 === 0 || i === doc.numPages) renderSide();
+    if (i % 8 === 0 || i === doc.numPages) {
+      renderSide();
+      suggestions?.refresh();
+    }
   }
+}
+
+// PDF text comes in pieces. Join them by where they sit on the page, so a word split around a
+// ligature ("signi" + "fi" + "cance") stays one word, and separate words keep their space.
+function joinTextItems(items) {
+  let out = "";
+  let prev = null;
+  for (const it of items) {
+    const str = it.str || "";
+    if (prev) {
+      if (prev.hasEOL) out += "\n";
+      else if (str && prev.str) {
+        const size = Math.hypot(it.transform[2], it.transform[3]) || 10;
+        const sameLine = Math.abs(it.transform[5] - prev.transform[5]) < size * 0.5;
+        const gap = it.transform[4] - (prev.transform[4] + prev.width);
+        const touching = sameLine && gap < size * 0.12 && gap > -size * 0.5;
+        if (!touching && !/\s$/.test(out) && !/^\s/.test(str)) out += sameLine ? " " : "\n";
+      }
+    }
+    out += str;
+    if (str || it.hasEOL) prev = it;
+  }
+  return out.replace(/[\uFB00-\uFB06]/g, (c) => ({ "\uFB00": "ff", "\uFB01": "fi", "\uFB02": "fl", "\uFB03": "ffi", "\uFB04": "ffl", "\uFB05": "st", "\uFB06": "st" })[c]);
+}
+
+// ---------------- Side panel tabs ----------------
+function setSideTab(tab) {
+  sideTab = tab;
+  const saved = tab === "saved";
+  $("tabSaved").setAttribute("aria-selected", String(saved));
+  $("tabSuggest").setAttribute("aria-selected", String(!saved));
+  $("sideList").hidden = !saved;
+  $("suggestPane").hidden = saved;
+  $("sideMeta").hidden = !saved;
+}
+
+function wireSideTabs() {
+  $("tabSaved").addEventListener("click", () => setSideTab("saved"));
+  $("tabSuggest").addEventListener("click", () => setSideTab("suggest"));
 }
 
 // ---------------- Side panel: terms in this PDF ----------------

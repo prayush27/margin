@@ -172,6 +172,55 @@ async function fromOpenStax(term, fields) {
   return { matched: matched.map((m) => m.r), other };
 }
 
+/**
+ * Every bundled glossary term for a subject, for scanning a whole document ("Terms on this page").
+ * Returns [{ term, text, source }] with OpenStax books in this subject's fields, plus NIST for CS.
+ */
+const glossaries = new Map();
+export function glossaryFor(subject) {
+  const plan = PLANS[subject];
+  if (!plan) return Promise.resolve([]);
+  if (!glossaries.has(subject)) glossaries.set(subject, buildGlossary(plan));
+  return glossaries.get(subject);
+}
+
+async function buildGlossary(plan) {
+  const out = [];
+  if (plan.nist) {
+    const nist = await loadBundled("data/nist-dads.json");
+    for (const [term, [def, slug]] of Object.entries(nist))
+      out.push({
+        term,
+        text: trimTo(sentence(def)),
+        source: { label: "NIST", detail: "Dictionary of Algorithms and Data Structures", url: `https://xlinux.nist.gov/dads/HTML/${slug}.html`, license: "Public domain" },
+      });
+  }
+  const books = await loadBundled("data/openstax/books.json");
+  if (!Array.isArray(books)) return out;
+  const wanted = new Map();
+  books.forEach((b, i) => {
+    const rank = plan.fields.findIndex((f) => b.f.includes(f));
+    if (rank >= 0) wanted.set(i, rank);
+  });
+  if (!wanted.size) return out;
+  const shards = await Promise.all([..."_abcdefghijklmnopqrstuvwxyz"].map((c) => loadBundled(`data/openstax/${c}.json`)));
+  const have = new Set(out.map((g) => g.term));
+  for (const shard of shards)
+    for (const [term, entries] of Object.entries(shard)) {
+      if (have.has(term)) continue;
+      const best = entries.filter(([bi]) => wanted.has(bi)).sort((a, b) => wanted.get(a[0]) - wanted.get(b[0]))[0];
+      if (!best) continue;
+      const b = books[best[0]];
+      have.add(term);
+      out.push({
+        term,
+        text: trimTo(sentence(best[1])),
+        source: { label: "OpenStax", detail: b.t, url: `https://openstax.org/details/books/${b.s}`, license: b.l },
+      });
+    }
+  return out;
+}
+
 async function fromNist(term) {
   const data = await loadBundled("data/nist-dads.json");
   for (const v of variants(norm(term))) {
