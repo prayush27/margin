@@ -1,4 +1,5 @@
 import * as store from "../shared/storage.js";
+import { siteActive, isStudySite, setSiteOn, BLOCKED_HOSTS } from "../shared/sites.js";
 
 const $ = (id) => document.getElementById(id);
 const { terms, courses, settings } = await store.getAll();
@@ -18,16 +19,24 @@ try {
 } catch {}
 
 const toggle = $("siteToggle");
+const shortHost = host.replace(/^www\./, "");
+function describeSite(s) {
+  if (!s.enabled) return "Margin is off everywhere (Settings)";
+  const on = siteActive(s, host);
+  if (s.disabledHosts.includes(host)) return `Paused on ${shortHost}`;
+  if (s.scope === "everywhere") return `On for ${shortHost}`;
+  if (isStudySite(host)) return `On for ${shortHost} · study site`;
+  return on ? `On for ${shortHost} · you turned it on` : `Off for ${shortHost} · not a study site`;
+}
 if (canRun) {
-  $("siteHost").textContent = host;
-  if (host === "docs.google.com") {
+  if (BLOCKED_HOSTS.has(host)) {
     toggle.checked = false;
     toggle.disabled = true;
     $("siteHost").textContent = "Google Docs isn't supported yet";
   } else {
-    toggle.checked = settings.enabled && !settings.disabledHosts.includes(host);
+    toggle.checked = siteActive(settings, host);
     toggle.disabled = !settings.enabled;
-    if (!settings.enabled) $("siteHost").textContent = "Margin is off everywhere (Settings)";
+    $("siteHost").textContent = describeSite(settings);
   }
 } else if (tab?.url?.startsWith(chrome.runtime.getURL(""))) {
   toggle.checked = true;
@@ -39,11 +48,8 @@ if (canRun) {
 $("siteRow").classList.toggle("disabled", toggle.disabled);
 
 toggle.addEventListener("change", async () => {
-  const s = await store.getSettings();
-  const set = new Set(s.disabledHosts);
-  if (toggle.checked) set.delete(host);
-  else set.add(host);
-  await store.updateSettings({ disabledHosts: [...set] });
+  const s = await store.updateSettings(setSiteOn(await store.getSettings(), host, toggle.checked));
+  $("siteHost").textContent = describeSite(s);
 });
 
 // Course scope

@@ -26,7 +26,7 @@ When you open a PDF from the web, Margin's viewer downloads that PDF from its or
 | Permission | Why |
 | --- | --- |
 | `storage`, `unlimitedStorage` | Keep your glossary on your computer, with no size cap for large courses. |
-| Access to all sites | Underline your saved terms on any page you read, and fetch the definition sources above. |
+| Access to all sites | Underline your saved terms on school and learning sites (and any site you turn on), save terms from any page, and fetch the definition sources above. By default Margin stays inactive on other sites. |
 | `contextMenus` | The right-click **Save to Margin** item. |
 | `webRequest`, `webNavigation` | Notice when a tab opens a PDF so it can open in Margin's viewer instead (you can turn this off in Settings). |
 

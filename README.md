@@ -41,7 +41,7 @@ Select text and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd>, click the **Save
 <td width="50%" valign="top">
 
 ### Definitions everywhere you read
-Saved terms get a soft amber underline on every site, including plurals, aliases (“BST” → binary search tree) and content that loads later. Hover for your definition, the course, and where you first saw it.
+Saved terms get a soft amber underline on your course sites (Canvas, .edu pages, Gradescope, OpenStax, Wikipedia and other learning sites), including plurals, aliases (“BST” → binary search tree) and content that loads later. Hover for your definition, the course, and where you first saw it. Other sites stay untouched unless you turn Margin on for them, or choose **Everywhere** in Settings.
 
 </td>
 </tr>

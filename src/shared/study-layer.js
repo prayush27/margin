@@ -6,9 +6,9 @@ import { buildMatcher } from "./matcher.js";
 import { Highlighter } from "./highlighter.js";
 import { createOverlay } from "./ui.js";
 import { guessDefinition, sentenceAround } from "./extract.js";
+import { siteActive, isStudySite, setSiteOn, BLOCKED_HOSTS } from "./sites.js";
 
 const PAGE_STYLE_ID = "margin-highlight-style";
-const BLOCKED_HOSTS = new Set(["docs.google.com"]);
 
 function injectPageStyle() {
   if (document.getElementById(PAGE_STYLE_ID)) return;
@@ -53,8 +53,7 @@ export async function attachStudyLayer({ root, getSource, extensionPage = false,
   const host = location.hostname;
   if (!extensionPage) injectPageStyle();
 
-  const active = () =>
-    data.settings.enabled && (extensionPage || (!data.settings.disabledHosts.includes(host) && !BLOCKED_HOSTS.has(host)));
+  const active = () => (extensionPage ? data.settings.enabled : siteActive(data.settings, host, location.protocol));
 
   function refresh() {
     highlighter.setMode(data.settings.underline);
@@ -271,10 +270,16 @@ export async function attachStudyLayer({ root, getSource, extensionPage = false,
       context: looksLikeDefinition ? "" : context,
       source,
     });
-    await store.updateSettings({ lastCourse: courseId });
+    // Saving a term somewhere Margin was off (a blog, a news site) turns it on for that site,
+    // so the new term is underlined right away. Sites you paused yourself stay paused.
+    const turnOn =
+      !extensionPage && host && location.protocol !== "file:" && !active() && !BLOCKED_HOSTS.has(host) &&
+      data.settings.enabled && !data.settings.disabledHosts.includes(host) && !isStudySite(host);
+    await store.updateSettings({ lastCourse: courseId, ...(turnOn ? setSiteOn(data.settings, host, true) : {}) });
     document.getSelection()?.removeAllRanges();
     overlay.toast(
-      created ? `Saved “${saved.term}”${courseName ? ` to ${courseName}` : ""}` : `Updated “${saved.term}”`,
+      (created ? `Saved “${saved.term}”${courseName ? ` to ${courseName}` : ""}` : `Updated “${saved.term}”`) +
+        (turnOn ? `. Margin is now on for ${host.replace(/^www\./, "")}` : ""),
       created ? { label: "Undo", run: () => store.deleteTerm(saved.id) } : null,
     );
     return true;

@@ -6,6 +6,8 @@
 
 export const DEFAULT_SETTINGS = {
   enabled: true,
+  scope: "study", // "study" (school and learning sites, plus allowedHosts) | "everywhere"
+  allowedHosts: [],
   disabledHosts: [],
   underline: "all", // "all" | "first"
   selectionPill: true,

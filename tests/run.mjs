@@ -1,8 +1,9 @@
-// Unit tests for Margin's pure logic: term matching, definition guessing, subject detection.
+// Unit tests for Margin's pure logic: term matching, definition guessing, subject detection, study sites.
 // No dependencies. Run with Node (`node tests/run.mjs`) or macOS JavaScriptCore (`jsc -m tests/run.mjs`).
 import { buildMatcher } from "../src/shared/matcher.js";
 import { guessDefinition, sentenceAround } from "../src/shared/extract.js";
 import { subjectFor } from "../src/shared/lookup.js";
+import { isStudySite, siteActive, setSiteOn } from "../src/shared/sites.js";
 
 const log = globalThis.print ?? console.log;
 let passed = 0;
@@ -52,6 +53,26 @@ eq("PSYCH 202", subjectFor("PSYCH 202"), "psychology");
 eq("course name words", subjectFor("Intro to Psychology"), "psychology");
 eq("stems", subjectFor("Organic Chem"), "chemistry");
 eq("unknown", subjectFor("Seminar 1"), "");
+
+log("study sites");
+const study = ["canvas.wisc.edu", "wisc.instructure.com", "www.gradescope.com", "en.wikipedia.org", "openstax.org", "ox.ac.uk", "www.unimelb.edu.au", "pubmed.ncbi.nlm.nih.gov", "developer.mozilla.org"];
+const notStudy = ["mail.google.com", "www.youtube.com", "www.reddit.com", "news.ycombinator.com", "notedu.com", "edu.example.com", "fakewikipedia.org"];
+eq("school and learning sites", study.filter((x) => !isStudySite(x)), []);
+eq("everything else", notStudy.filter((x) => isStudySite(x)), []);
+const S = { enabled: true, scope: "study", allowedHosts: [], disabledHosts: [] };
+eq("on for a study site", siteActive(S, "canvas.wisc.edu"), true);
+eq("off for other sites", siteActive(S, "www.youtube.com"), false);
+eq("always on for local files", siteActive(S, "", "file:"), true);
+eq("never on Google Docs", siteActive({ ...S, scope: "everywhere" }, "docs.google.com"), false);
+eq("everywhere mode", siteActive({ ...S, scope: "everywhere" }, "www.youtube.com"), true);
+eq("off when Margin is off", siteActive({ ...S, enabled: false }, "canvas.wisc.edu"), false);
+const on = { ...S, ...setSiteOn(S, "blog.example.com", true) };
+eq("turning a site on", [siteActive(on, "blog.example.com"), on.allowedHosts], [true, ["blog.example.com"]]);
+const off = { ...on, ...setSiteOn(on, "blog.example.com", false) };
+eq("turning it off again", [siteActive(off, "blog.example.com"), off.allowedHosts, off.disabledHosts], [false, [], ["blog.example.com"]]);
+const paused = { ...S, ...setSiteOn(S, "canvas.wisc.edu", false) };
+eq("pausing a study site", siteActive(paused, "canvas.wisc.edu"), false);
+eq("resuming it", siteActive({ ...paused, ...setSiteOn(paused, "canvas.wisc.edu", true) }, "canvas.wisc.edu"), true);
 
 log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) throw new Error(`${failures.length} test(s) failed: ${failures.join(", ")}`);

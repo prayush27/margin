@@ -852,6 +852,18 @@ function renderSettings() {
       "div",
       { class: "list-card" },
       settingRow("Underline saved terms", "Turn Margin on or off everywhere.", toggle("enabled")),
+      settingRow(
+        "Where to underline",
+        s.scope === "everywhere"
+          ? "On every website, except sites you pause."
+          : "Only on school and learning sites (.edu, Canvas, Gradescope, OpenStax, Wikipedia…), your PDFs, and sites you turn on.",
+        h(
+          "div",
+          { class: "seg", role: "group", "aria-label": "Where to underline" },
+          h("button", { class: s.scope !== "everywhere" ? "on" : "", onclick: () => store.updateSettings({ scope: "study" }) }, "Study sites"),
+          h("button", { class: s.scope === "everywhere" ? "on" : "", onclick: () => store.updateSettings({ scope: "everywhere" }) }, "Everywhere"),
+        ),
+      ),
       settingRow("Only the first time per page", "Underline each term once per page instead of every time it appears. Less busy on long readings.", h("label", { class: "switch" }, underlineFirst, h("span"))),
       settingRow("Show “Save term” when selecting text", `A small button appears next to short selections. The ${SHORTCUT_LABEL} shortcut always works.`, toggle("selectionPill")),
       settingRow("Open PDFs in Margin", "Web PDFs you open in Chrome switch to Margin's viewer automatically.", toggle("openPdfs")),
@@ -887,32 +899,42 @@ function renderSettings() {
     ),
   );
 
-  // Disabled sites
+  // Per-site choices
+  const hostChips = (hosts, key, verb) =>
+    h(
+      "div",
+      {},
+      ...hosts.map((host) =>
+        h(
+          "span",
+          { class: "host-chip" },
+          host,
+          h("button", {
+            "aria-label": `${verb} ${host}`,
+            title: verb,
+            html: "×",
+            onclick: () => store.updateSettings({ [key]: s[key].filter((x) => x !== host) }),
+          }),
+        ),
+      ),
+    );
+  const allowed = s.scope === "everywhere" ? [] : s.allowedHosts;
   page.append(
-    h("h2", { class: "section" }, "Paused sites"),
+    h("h2", { class: "section" }, "Sites"),
     h(
       "div",
       { class: "list-card" },
+      s.scope !== "everywhere" &&
+        settingRow(
+          allowed.length ? "Also on" : "No extra sites",
+          allowed.length
+            ? hostChips(allowed, "allowedHosts", "Turn off on")
+            : "Turn Margin on for any other site from the toolbar popup. Saving a term on a site turns it on there too.",
+          null,
+        ),
       settingRow(
-        s.disabledHosts.length ? "Margin is paused on these sites" : "No paused sites",
-        s.disabledHosts.length
-          ? h(
-              "div",
-              {},
-              ...s.disabledHosts.map((host) =>
-                h(
-                  "span",
-                  { class: "host-chip" },
-                  host,
-                  h("button", {
-                    "aria-label": `Resume on ${host}`,
-                    html: "×",
-                    onclick: () => store.updateSettings({ disabledHosts: s.disabledHosts.filter((x) => x !== host) }),
-                  }),
-                ),
-              ),
-            )
-          : "Pause Margin on a site from the toolbar popup. Google Docs is always skipped.",
+        s.disabledHosts.length ? "Paused" : "No paused sites",
+        s.disabledHosts.length ? hostChips(s.disabledHosts, "disabledHosts", "Resume on") : "Pause Margin on a site from the toolbar popup. Google Docs is always skipped.",
         null,
       ),
     ),
