@@ -78,7 +78,7 @@
   }
   if (FORM_URL) {
     var f = document.getElementById("fbForm");
-    f.href = FORM_URL;
+    f.href = FORM_URL.replace("VERSION", encodeURIComponent(v || "unknown"));
     f.hidden = false;
   }
 })();
