@@ -4,6 +4,8 @@
 // courses:  [{ id, name, color, createdAt }]
 // settings: see DEFAULT_SETTINGS
 
+import { courseKey } from "./sites.js";
+
 export const DEFAULT_SETTINGS = {
   enabled: true,
   scope: "study", // "study" (school and learning sites, plus allowedHosts) | "everywhere"
@@ -17,6 +19,8 @@ export const DEFAULT_SETTINGS = {
   lastCourse: null,
   darkPdf: false,
   welcomed: false,
+  sidebarCourse: null, // class shown in the side panel when a page doesn't say which
+  courseSites: {}, // courseKey(url) -> course id, e.g. "canvas.wisc.edu/courses/12345": "cs"
 };
 
 export const COURSE_COLORS = ["#e0962b", "#3b82f6", "#22a06b", "#8b5cf6", "#e5527a", "#14a3a3", "#d9622b", "#6b7280"];
@@ -126,7 +130,17 @@ export async function saveTerm(input) {
   };
   terms.push(created);
   await chrome.storage.local.set({ terms });
+  await rememberCourseSite(created.source?.url, created.courseId);
   return { term: created, created: true };
+}
+
+/** Remembers that pages like `url` (e.g. one Canvas course) belong to `courseId`. */
+export async function rememberCourseSite(url, courseId) {
+  const key = url && courseId ? courseKey(url) : "";
+  if (!key) return;
+  const s = await getSettings();
+  if (s.courseSites[key] === courseId) return;
+  await updateSettings({ courseSites: { ...s.courseSites, [key]: courseId } });
 }
 
 export async function updateTerm(id, patch) {

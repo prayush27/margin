@@ -175,6 +175,14 @@ async function openDocument(source, info) {
     layer = await attachStudyLayer({
       root: $("viewer"),
       extensionPage: true,
+      getPageText: () => pageTexts.map((t) => t || "").join("\n\n"),
+      revealTerm: (term) => {
+        const m = buildMatcher([term]);
+        const i = pageTexts.findIndex((t) => t && m.find(t).length);
+        if (i < 0) return false;
+        viewer.currentPageNumber = i + 1;
+        return true;
+      },
       getSource: (range) => {
         const pageEl = range?.startContainer?.parentElement?.closest?.(".page");
         const page = Number(pageEl?.dataset.pageNumber) || viewer.currentPageNumber;

@@ -98,7 +98,8 @@ header .btn {
   text-decoration: none;
   height: 34px;
 }
-.actions .btn.primary {
+.actions .btn.primary,
+.actions .btn.wide {
   grid-column: 1 / -1;
 }
 footer {

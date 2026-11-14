@@ -102,3 +102,11 @@ chrome.commands.getAll().then((cmds) => {
   const c = cmds.find((x) => x.name === "save-term");
   if (c?.shortcut) $("shortcut").textContent = c.shortcut;
 });
+
+// Class sidebar. sidePanel.open() needs the click's user gesture, so no awaits before it.
+$("openSidebar").addEventListener("click", () => {
+  chrome.sidePanel
+    .open({ windowId: tab.windowId })
+    .then(() => window.close())
+    .catch(() => {});
+});

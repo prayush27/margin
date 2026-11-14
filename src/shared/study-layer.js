@@ -14,7 +14,7 @@ function injectPageStyle() {
   if (document.getElementById(PAGE_STYLE_ID)) return;
   const style = document.createElement("style");
   style.id = PAGE_STYLE_ID;
-  style.textContent = `::highlight(margin-term){background-color:rgba(242,169,59,.2);text-decoration:underline dotted rgba(214,138,30,.95);text-decoration-thickness:1.5px;text-underline-offset:3px;}`;
+  style.textContent = `::highlight(margin-term){background-color:rgba(242,169,59,.2);text-decoration:underline dotted rgba(214,138,30,.95);text-decoration-thickness:1.5px;text-underline-offset:3px;}::highlight(margin-flash){background-color:rgba(242,169,59,.6);color:inherit;}`;
   (document.head || document.documentElement).appendChild(style);
 }
 
@@ -43,7 +43,7 @@ const squash = (s) => (s || "").replace(/\s+/g, " ").trim();
  * @param {(range: Range) => object} opts.getSource   returns {url,title,page}
  * @param {boolean} [opts.extensionPage]  true for Margin's own pages (viewer/hub)
  */
-export async function attachStudyLayer({ root, getSource, extensionPage = false, ignoreSelector = null }) {
+export async function attachStudyLayer({ root, getSource, extensionPage = false, ignoreSelector = null, getPageText = null, revealTerm = null }) {
   let data = await store.getAll();
   const overlay = createOverlay();
   const highlighter = new Highlighter({
@@ -293,6 +293,44 @@ export async function attachStudyLayer({ root, getSource, extensionPage = false,
     if (msg.text && info && !info.text.includes(squash(msg.text).slice(0, 20))) return;
     saveFromSelection(info ? undefined : msg.text);
   });
+
+  // ---------- Class sidebar ----------
+  // The side panel asks for the page's text (to list this class's terms on it) and asks to
+  // scroll to a term when you click it. Web pages answer from the top frame; Margin's own pages
+  // (PDF viewer) answer only for their own tab.
+  let myTabId = null;
+  if (extensionPage) chrome.tabs?.getCurrent?.((t) => (myTabId = t?.id ?? null));
+  const forMe = (msg) => (extensionPage ? msg.tabId != null && msg.tabId === myTabId : window === window.top);
+
+  chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+    if (msg?.type === "page-text" && forMe(msg)) {
+      const text = getPageText ? getPageText() : root.innerText || "";
+      sendResponse({ ok: true, text: text.slice(0, 600000), url: location.href, title: document.title });
+    } else if (msg?.type === "reveal-term" && forMe(msg) && msg.term) {
+      sendResponse({ ok: revealTerm ? revealTerm(msg.term) : reveal(msg.term) });
+    }
+  });
+
+  function reveal(term) {
+    const matcher = buildMatcher([term]);
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => (n.parentElement && !overlay.contains(n.parentElement) && n.parentElement.offsetParent !== null ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT),
+    });
+    let n;
+    while ((n = walker.nextNode())) {
+      const hit = matcher.find(n.data)[0];
+      if (!hit) continue;
+      const range = document.createRange();
+      range.setStart(n, hit.start);
+      range.setEnd(n, hit.end);
+      n.parentElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      injectPageStyle();
+      CSS.highlights.set("margin-flash", new Highlight(range));
+      setTimeout(() => CSS.highlights.delete("margin-flash"), 1800);
+      return true;
+    }
+    return false;
+  }
 
   return {
     highlighter,

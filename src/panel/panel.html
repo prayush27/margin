@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Margin</title>
+    <link rel="stylesheet" href="../styles/tokens.css" />
+    <link rel="stylesheet" href="panel.css" />
+  </head>
+  <body>
+    <header class="top">
+      <div class="brand"><span class="logo" aria-hidden="true"></span><span>Margin</span></div>
+      <label class="class-pick">
+        <span class="sr">Class</span>
+        <select id="course" class="select"></select>
+      </label>
+      <p class="hint" id="courseHint" hidden></p>
+      <div class="search">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="7" cy="7" r="4.5" fill="none" stroke="currentColor" stroke-width="1.5" /><path d="m10.5 10.5 3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" /></svg>
+        <input id="search" type="search" placeholder="Search this class" autocomplete="off" />
+      </div>
+    </header>
+
+    <main id="list" aria-live="polite"></main>
+
+    <footer class="foot">
+      <a class="btn primary" id="quiz" target="_blank">Quiz this class</a>
+      <a class="btn" id="glossary" target="_blank">Glossary</a>
+    </footer>
+    <script type="module" src="panel.js"></script>
+  </body>
+</html>

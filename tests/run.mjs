@@ -3,7 +3,7 @@
 import { buildMatcher } from "../src/shared/matcher.js";
 import { guessDefinition, sentenceAround } from "../src/shared/extract.js";
 import { subjectFor } from "../src/shared/lookup.js";
-import { isStudySite, siteActive, setSiteOn } from "../src/shared/sites.js";
+import { isStudySite, siteActive, setSiteOn, courseKey } from "../src/shared/sites.js";
 import { findKeyTerms, cleanText } from "../src/shared/keyterms.js";
 
 const log = globalThis.print ?? console.log;
@@ -96,6 +96,32 @@ eq("counts plurals with the term", byTerm.heap?.count >= 3, true);
 eq("finds unglossaried phrases that repeat", !!byTerm["amortized analysis"], true);
 eq("skips everyday glossary words, saved terms, code and notes", ["set", "binary search tree", "removeMax", "Unsorted array", "homework"].filter((t) => byTerm[t]), []);
 eq("joins PDF ligatures", cleanText("signi\uFB01cance"), "significance");
+
+// The JavaScriptCore shell has no URL; a minimal stand-in for the parts Margin uses.
+if (typeof globalThis.URL === "undefined") {
+  globalThis.URL = class {
+    constructor(s) {
+      const m = /^([a-z][a-z0-9+.-]*:)(?:\/\/([^/?#]*))?([^?#]*)(\?[^#]*)?/i.exec(String(s));
+      if (!m) throw new TypeError("Invalid URL");
+      this.protocol = m[1].toLowerCase();
+      this.hostname = (m[2] || "").replace(/:\d+$/, "").toLowerCase();
+      this.pathname = m[3] || "/";
+      const q = new Map((m[4] || "").slice(1).split("&").filter(Boolean).map((kv) => kv.split("=").map((x) => decodeURIComponent(x.replace(/\+/g, " ")))));
+      this.searchParams = { get: (k) => (q.has(k) ? q.get(k) : null) };
+    }
+  };
+}
+
+// Class sidebar: which class a page belongs to
+eq("canvas course pages share one key", [
+  courseKey("https://canvas.wisc.edu/courses/12345"),
+  courseKey("https://canvas.wisc.edu/courses/12345/modules?x=1"),
+  courseKey("https://canvas.wisc.edu/courses/12345/files/9/download"),
+], ["canvas.wisc.edu/courses/12345", "canvas.wisc.edu/courses/12345", "canvas.wisc.edu/courses/12345"]);
+eq("different courses differ", courseKey("https://canvas.wisc.edu/courses/1") !== courseKey("https://canvas.wisc.edu/courses/2"), true);
+eq("moodle and gradescope", [courseKey("https://moodle.ox.ac.uk/course/view.php?id=77"), courseKey("https://www.gradescope.com/courses/555/assignments")], ["moodle.ox.ac.uk/course/77", "gradescope.com/courses/555"]);
+eq("PDF viewer uses the PDF's address", courseKey("chrome-extension://abc/src/viewer/viewer.html?file=" + encodeURIComponent("https://canvas.wisc.edu/courses/12345/files/9")), "canvas.wisc.edu/courses/12345");
+eq("non-course pages have no key", ["https://en.wikipedia.org/wiki/Heap", "file:///notes.pdf", "not a url", "https://example.com/courseware"].map(courseKey), ["", "", "", ""]);
 
 log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) throw new Error(`${failures.length} test(s) failed: ${failures.join(", ")}`);

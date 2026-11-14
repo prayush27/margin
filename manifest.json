@@ -22,26 +22,56 @@
     "service_worker": "src/background.js",
     "type": "module"
   },
-  "permissions": ["storage", "unlimitedStorage", "contextMenus", "webRequest"],
-  "host_permissions": ["<all_urls>"],
+  "side_panel": {
+    "default_path": "src/panel/panel.html"
+  },
+  "permissions": [
+    "storage",
+    "unlimitedStorage",
+    "contextMenus",
+    "webRequest",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
   "commands": {
     "save-term": {
-      "suggested_key": { "default": "Alt+Shift+S", "mac": "Alt+Shift+S" },
+      "suggested_key": {
+        "default": "Alt+Shift+S",
+        "mac": "Alt+Shift+S"
+      },
       "description": "Save the selected text as a term"
+    },
+    "open-sidebar": {
+      "suggested_key": {
+        "default": "Alt+Shift+M",
+        "mac": "Alt+Shift+M"
+      },
+      "description": "Open the class sidebar"
     }
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["src/content/loader.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "src/content/loader.js"
+      ],
       "run_at": "document_idle",
       "all_frames": true
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/content/*", "src/shared/*"],
-      "matches": ["<all_urls>"]
+      "resources": [
+        "src/content/*",
+        "src/shared/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
     }
   ],
   "content_security_policy": {

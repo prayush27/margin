@@ -15,6 +15,7 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
       targetUrlPatterns: ["*://*/*.pdf*", "*://*/*.PDF*", "*://*/*/files/*", "file:///*.pdf", "file:///*.PDF"],
     });
     chrome.contextMenus.create({ id: "open-hub", title: "Open Margin glossary", contexts: ["action"] });
+    chrome.contextMenus.create({ id: "open-sidebar", title: "Open class sidebar", contexts: ["action"] });
   });
   if (reason === "install") {
     const s = await getSettings();
@@ -44,11 +45,15 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
     chrome.tabs.create({ url: viewerUrl({ file: info.linkUrl }), index: tab ? tab.index + 1 : undefined });
   } else if (info.menuItemId === "open-hub") {
     chrome.tabs.create({ url: HUB_URL });
+  } else if (info.menuItemId === "open-sidebar" && tab) {
+    chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => {});
   }
 });
 
 chrome.commands.onCommand.addListener((command, tab) => {
   if (command === "save-term") requestSave(tab);
+  // Called right away (no awaits) so Chrome still counts the key press as the user gesture.
+  else if (command === "open-sidebar" && tab) chrome.sidePanel.open({ windowId: tab.windowId }).catch(() => {});
 });
 
 // ---------- Messages from pages ----------

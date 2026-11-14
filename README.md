@@ -76,6 +76,9 @@ Every term lives in a searchable glossary, organized by course. Quiz yourself fr
 </picture>
 </p>
 
+### Class sidebar
+Open the sidebar from the Margin menu or press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>M</kbd>. It lists every term you've saved for one class, with the ones on the page you're reading at the top, and it stays open as you switch tabs. On a Canvas course you've saved terms from, it picks that class by itself. Click a term to see its definition and jump to it on the page.
+
 **Also:** light and dark mode everywhere · JSON and CSV export/import · per-course colors · source links back to the exact page of the PDF · undo right after saving · CSV export for Anki or Quizlet.
 
 ## Where definitions come from
@@ -162,6 +165,7 @@ No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaS
 - [x] Hover definitions on any page, PDF viewer, glossary, quiz
 - [x] **Find one**: subject-aware definitions from textbooks, field references and encyclopedias
 - [x] **Suggested terms** in lecture PDFs: glossary matches, slide definitions and word-rarity scoring
+- [x] **Class sidebar**: one class's terms beside any page, with the ones on the page first
 - [ ] Lecture videos: catch terms in captions, with “explained at 34:12” timestamps
 - [ ] Suggested terms on course web pages, not just PDFs
 - [ ] Chrome Web Store release (the only official download)

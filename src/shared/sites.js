@@ -67,3 +67,26 @@ export function setSiteOn(settings, host, on) {
   }
   return { disabledHosts: [...disabled], allowedHosts: [...allowed] };
 }
+
+/**
+ * A stable key for "this class's pages", used to remember which Margin course a page belongs to.
+ * Canvas (and most course sites) put the course id in the path: canvas.wisc.edu/courses/12345/...
+ * Also handles Margin's PDF viewer URLs (?file=...) by looking at the PDF's own address.
+ * Returns "" when a URL doesn't identify a course.
+ */
+export function courseKey(url) {
+  let u;
+  try {
+    u = new URL(url);
+  } catch {
+    return "";
+  }
+  if (u.protocol === "chrome-extension:" && u.searchParams.get("file")) return courseKey(u.searchParams.get("file"));
+  if (!/^https?:$/.test(u.protocol)) return "";
+  const host = u.hostname.replace(/^www\./, "");
+  const id = /^\/course\/view\.php$/.test(u.pathname) && u.searchParams.get("id"); // Moodle
+  if (id) return `${host}/course/${id}`;
+  const m = u.pathname.match(/^\/(courses?|classes|class|sections?)\/([A-Za-z0-9_-]+)(?=\/|$)/i); // Canvas, Gradescope, Blackboard Ultra, …
+  if (m) return `${host}/${m[1].toLowerCase()}/${m[2]}`;
+  return "";
+}
