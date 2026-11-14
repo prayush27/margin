@@ -66,7 +66,7 @@
 <script>
 // The extension links here with ?v=<version>. Fill it into the bug report so I know which build you have.
 (function () {
-  var FORM_URL = ""; // set to a Google Form (or similar) link to show the "Quick form" option
+  var FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe2kAg6DZ98AVTqn3o1gStzVRUP2JObvb3G0GNz7_LXE1EyKw/viewform?usp=pp_url&entry.1926587393=VERSION"; // set to a Google Form (or similar) link to show the "Quick form" option
   var p = new URLSearchParams(location.search);
   var v = (p.get("v") || "").replace(/[^0-9.]/g, "").slice(0, 20);
   var chrome = (navigator.userAgent.match(/Chrome\/(\d+)/) || [])[1];
