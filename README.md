@@ -79,6 +79,8 @@ Every term lives in a searchable glossary, organized by course. Quiz yourself fr
 ### Class sidebar
 Open the sidebar from the Margin menu or press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>M</kbd>. It lists every term you've saved for one class, with the ones on the page you're reading at the top, and it stays open as you switch tabs. On a Canvas course you've saved terms from, it picks that class by itself. Click a term to see its definition and jump to it on the page.
 
+<p align="center"><img src=".github/media/sidebar.png" width="860" alt="A CS 400 course page with saved terms underlined and Margin's class sidebar listing the terms on the page first"></p>
+
 **Also:** light and dark mode everywhere · JSON and CSV export/import · per-course colors · source links back to the exact page of the PDF · undo right after saving · CSV export for Anki or Quizlet.
 
 ## Where definitions come from
