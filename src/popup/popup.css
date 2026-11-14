@@ -191,3 +191,27 @@ footer {
 .pdf-row .btn {
   justify-content: center;
 }
+
+.actions .new {
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: var(--mark-soft);
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 600;
+}
+.backup {
+  display: block;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border-radius: var(--r-md);
+  background: var(--mark-soft);
+  color: var(--text);
+  font-size: var(--fs-13);
+  font-weight: 500;
+  text-decoration: none;
+}
+.backup:hover {
+  background: var(--hover);
+}

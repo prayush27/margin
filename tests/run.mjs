@@ -3,7 +3,8 @@
 import { buildMatcher } from "../src/shared/matcher.js";
 import { guessDefinition, sentenceAround } from "../src/shared/extract.js";
 import { subjectFor } from "../src/shared/lookup.js";
-import { isStudySite, siteActive, setSiteOn, courseKey } from "../src/shared/sites.js";
+import { isStudySite, siteActive, setSiteOn, courseKey, courseSitesFromTerms } from "../src/shared/sites.js";
+import { backupDue } from "../src/shared/storage.js";
 import { findKeyTerms, cleanText } from "../src/shared/keyterms.js";
 
 const log = globalThis.print ?? console.log;
@@ -122,6 +123,24 @@ eq("different courses differ", courseKey("https://canvas.wisc.edu/courses/1") !=
 eq("moodle and gradescope", [courseKey("https://moodle.ox.ac.uk/course/view.php?id=77"), courseKey("https://www.gradescope.com/courses/555/assignments")], ["moodle.ox.ac.uk/course/77", "gradescope.com/courses/555"]);
 eq("PDF viewer uses the PDF's address", courseKey("chrome-extension://abc/src/viewer/viewer.html?file=" + encodeURIComponent("https://canvas.wisc.edu/courses/12345/files/9")), "canvas.wisc.edu/courses/12345");
 eq("non-course pages have no key", ["https://en.wikipedia.org/wiki/Heap", "file:///notes.pdf", "not a url", "https://example.com/courseware"].map(courseKey), ["", "", "", ""]);
+
+eq("older terms teach the sidebar their course pages", courseSitesFromTerms([
+  { courseId: "cs", source: { url: "https://canvas.wisc.edu/courses/1/files/2" } },
+  { courseId: "cs", source: { url: "https://canvas.wisc.edu/courses/1/pages/x" } },
+  { courseId: "bio", source: { url: "https://canvas.wisc.edu/courses/1/pages/y" } },
+  { courseId: "bio", source: { url: "https://en.wikipedia.org/wiki/Cell" } },
+  { courseId: null, source: { url: "https://canvas.wisc.edu/courses/9" } },
+]), { "canvas.wisc.edu/courses/1": "cs" });
+
+const D = 86400000, now = 100 * D;
+const many = (n, at) => Array.from({ length: n }, () => ({ createdAt: at }));
+eq("backup reminder", [
+  backupDue({ terms: many(10, 0), settings: {} }, now), // too few terms
+  backupDue({ terms: many(20, now - 5 * D), settings: {} }, now), // too new
+  backupDue({ terms: many(20, 0), settings: {} }, now), // due
+  backupDue({ terms: many(20, 0), settings: { lastBackup: now - 3 * D } }, now), // backed up recently
+  backupDue({ terms: many(20, 0), settings: { backupSnooze: now + D } }, now), // snoozed
+], [false, false, true, false, false]);
 
 log(`\n${passed} passed, ${failures.length} failed`);
 if (failures.length) throw new Error(`${failures.length} test(s) failed: ${failures.join(", ")}`);

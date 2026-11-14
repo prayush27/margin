@@ -90,3 +90,21 @@ export function courseKey(url) {
   if (m) return `${host}/${m[1].toLowerCase()}/${m[2]}`;
   return "";
 }
+
+/**
+ * Course pages implied by saved terms: { courseKey: courseId }, using the class most terms from
+ * that course page were saved to. Lets the sidebar recognize courses from terms saved earlier.
+ */
+export function courseSitesFromTerms(terms) {
+  const votes = new Map(); // key -> Map(courseId -> count)
+  for (const t of terms || []) {
+    const key = t.courseId && t.source?.url ? courseKey(t.source.url) : "";
+    if (!key) continue;
+    if (!votes.has(key)) votes.set(key, new Map());
+    const v = votes.get(key);
+    v.set(t.courseId, (v.get(t.courseId) || 0) + 1);
+  }
+  const out = {};
+  for (const [key, v] of votes) out[key] = [...v].sort((a, b) => b[1] - a[1])[0][0];
+  return out;
+}

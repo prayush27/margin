@@ -237,3 +237,4 @@ setInterval(() => document.visibilityState === "visible" && refresh(), 6000);
 document.addEventListener("visibilitychange", () => document.visibilityState === "visible" && refresh());
 
 refresh();
+store.getSettings().then((s) => s.seenSidebar || store.updateSettings({ seenSidebar: true }));

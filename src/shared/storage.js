@@ -4,7 +4,7 @@
 // courses:  [{ id, name, color, createdAt }]
 // settings: see DEFAULT_SETTINGS
 
-import { courseKey } from "./sites.js";
+import { courseKey, courseSitesFromTerms } from "./sites.js";
 
 export const DEFAULT_SETTINGS = {
   enabled: true,
@@ -21,6 +21,9 @@ export const DEFAULT_SETTINGS = {
   welcomed: false,
   sidebarCourse: null, // class shown in the side panel when a page doesn't say which
   courseSites: {}, // courseKey(url) -> course id, e.g. "canvas.wisc.edu/courses/12345": "cs"
+  seenSidebar: false, // shows a "New" tag on the popup's Class sidebar button until it's opened
+  lastBackup: null, // when terms were last exported
+  backupSnooze: 0, // don't remind about backups before this time
 };
 
 export const COURSE_COLORS = ["#e0962b", "#3b82f6", "#22a06b", "#8b5cf6", "#e5527a", "#14a3a3", "#d9622b", "#6b7280"];
@@ -132,6 +135,23 @@ export async function saveTerm(input) {
   await chrome.storage.local.set({ terms });
   await rememberCourseSite(created.source?.url, created.courseId);
   return { term: created, created: true };
+}
+
+/** Fills in course pages from terms saved before Margin tracked them. Choices already made win. */
+export async function backfillCourseSites() {
+  const { terms, courses, settings } = await getAll();
+  const known = new Set(courses.map((c) => c.id));
+  const found = Object.entries(courseSitesFromTerms(terms)).filter(([key, id]) => known.has(id) && !settings.courseSites[key]);
+  if (found.length) await updateSettings({ courseSites: { ...Object.fromEntries(found), ...settings.courseSites } });
+  return found.length;
+}
+
+const DAY = 86400000;
+/** Time to remind about a backup? After 15+ terms and 30 days since the last backup (or the first term). */
+export function backupDue({ terms = [], settings = {} }, now = Date.now()) {
+  if (terms.length < 15 || now < (settings.backupSnooze || 0)) return false;
+  const since = settings.lastBackup || Math.min(...terms.map((t) => t.createdAt ?? now));
+  return now - since > 30 * DAY;
 }
 
 /** Remembers that pages like `url` (e.g. one Canvas course) belong to `courseId`. */

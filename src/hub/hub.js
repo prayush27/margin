@@ -187,6 +187,7 @@ function renderGlossary(r) {
   );
 
   if (showWelcome) page.append(renderWelcome());
+  else if (store.backupDue(data)) page.append(renderBackupAsk());
 
   if (data.terms.length) {
     const search = h("input", {
@@ -315,6 +316,26 @@ function renderEntry(t, showCourse) {
   );
 }
 
+// Everything lives on this computer, so every month or so suggest downloading a copy.
+function renderBackupAsk() {
+  return h(
+    "div",
+    { class: "ask backup-ask" },
+    h(
+      "div",
+      { class: "grow" },
+      h("h4", {}, `Back up your ${data.terms.length} terms`),
+      h("p", {}, "Margin keeps your glossary on this computer only. Download a copy so a new laptop or a reset doesn't cost you a semester of terms."),
+    ),
+    h(
+      "div",
+      { class: "ask-actions" },
+      h("button", { class: "btn primary", onclick: exportJson }, "Download backup"),
+      h("button", { class: "btn ghost", onclick: () => store.updateSettings({ backupSnooze: Date.now() + 14 * 86400000 }) }, "Remind me later"),
+    ),
+  );
+}
+
 function renderWelcome() {
   return h(
     "section",
@@ -342,6 +363,13 @@ function renderWelcome() {
         "div",
         { class: "step" },
         h("span", { class: "num" }, "3"),
+        h("h4", {}, "Keep a class beside you"),
+        h("p", { html: `Open the <b>Class sidebar</b> from the Margin menu or press <kbd>${SIDEBAR_LABEL}</kbd>. It lists one class's terms, with the ones on the page first.` }),
+      ),
+      h(
+        "div",
+        { class: "step" },
+        h("span", { class: "num" }, "4"),
         h("h4", {}, "Quiz before exams"),
         h("p", {}, "Run a quick recall quiz per course. Missed terms come back first."),
       ),
@@ -381,6 +409,8 @@ function renderWelcome() {
     ),
   );
 }
+
+const SIDEBAR_LABEL = /Mac/i.test(navigator.platform || navigator.userAgent) ? "⌥⇧M" : "Alt+Shift+M";
 
 // ---------------- term dialog ----------------
 function fillCourseSelect(select, selected) {
@@ -1010,6 +1040,7 @@ function renderSettings() {
 function exportJson() {
   const payload = { app: "margin", version: 1, exportedAt: new Date().toISOString(), courses: data.courses, terms: data.terms };
   download(`margin-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(payload, null, 2), "application/json");
+  store.updateSettings({ lastBackup: Date.now() });
 }
 
 function csvCell(v) {
@@ -1023,6 +1054,7 @@ function exportCsv() {
     rows.push([t.term, t.definition, courseById(t.courseId)?.name || "", (t.aliases || []).join("; "), t.source?.title || "", t.source?.url?.startsWith("local:") ? "" : t.source?.url || "", t.source?.page || ""]);
   }
   download(`margin-terms-${new Date().toISOString().slice(0, 10)}.csv`, rows.map((r) => r.map(csvCell).join(",")).join("\n"), "text/csv");
+  store.updateSettings({ lastBackup: Date.now() });
 }
 
 function parseCsv(text) {

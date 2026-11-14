@@ -1,4 +1,4 @@
-import { getSettings, updateSettings } from "./shared/storage.js";
+import { getSettings, updateSettings, backfillCourseSites } from "./shared/storage.js";
 import { viewerUrl } from "./shared/recent.js";
 import { lookupDefinitions, subjectFor } from "./shared/lookup.js";
 
@@ -17,6 +17,7 @@ chrome.runtime.onInstalled.addListener(async ({ reason }) => {
     chrome.contextMenus.create({ id: "open-hub", title: "Open Margin glossary", contexts: ["action"] });
     chrome.contextMenus.create({ id: "open-sidebar", title: "Open class sidebar", contexts: ["action"] });
   });
+  backfillCourseSites().catch(() => {});
   if (reason === "install") {
     const s = await getSettings();
     if (!s.welcomed) {

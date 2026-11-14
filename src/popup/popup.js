@@ -104,9 +104,16 @@ chrome.commands.getAll().then((cmds) => {
 });
 
 // Class sidebar. sidePanel.open() needs the click's user gesture, so no awaits before it.
+$("sidebarNew").hidden = settings.seenSidebar;
 $("openSidebar").addEventListener("click", () => {
   chrome.sidePanel
     .open({ windowId: tab.windowId })
     .then(() => window.close())
     .catch(() => {});
 });
+
+// Gentle backup reminder (everything lives on this computer)
+if (store.backupDue({ terms, settings })) {
+  $("backup").textContent = `Back up your ${terms.length} terms →`;
+  $("backup").hidden = false;
+}
