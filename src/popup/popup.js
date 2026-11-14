@@ -2,6 +2,7 @@ import * as store from "../shared/storage.js";
 import { siteActive, isStudySite, setSiteOn, BLOCKED_HOSTS } from "../shared/sites.js";
 import { looksLikePdf, setOpenPdfs } from "../shared/pdfs.js";
 import { viewerUrl } from "../shared/recent.js";
+import { feedbackUrl } from "../shared/feedback.js";
 
 const $ = (id) => document.getElementById(id);
 const { terms, courses, settings } = await store.getAll();
@@ -117,3 +118,5 @@ if (store.backupDue({ terms, settings })) {
   $("backup").textContent = `Back up your ${terms.length} terms →`;
   $("backup").hidden = false;
 }
+
+$("feedback").href = feedbackUrl();

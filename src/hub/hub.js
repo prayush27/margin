@@ -3,6 +3,7 @@ import { attachStudyLayer } from "../shared/study-layer.js";
 import { SHORTCUT_LABEL, sourceLabel } from "../shared/ui.js";
 import { listRecent, removeRecent, touchRecent, viewerUrl } from "../shared/recent.js";
 import { setOpenPdfs } from "../shared/pdfs.js";
+import { feedbackUrl } from "../shared/feedback.js";
 
 const $ = (id) => document.getElementById(id);
 const main = $("main");
@@ -89,6 +90,8 @@ function sourceHref(source) {
   if (source.page || /\.pdf($|[?#])/i.test(source.url)) return viewerUrl({ file: source.url, page: source.page });
   return source.url;
 }
+
+$("feedbackLink").href = feedbackUrl();
 
 // ---------------- routing ----------------
 function route() {

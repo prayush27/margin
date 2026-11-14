@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Feedback · Margin</title>
+<meta name="description" content="Tell us what broke, what confused you, or what you wish Margin did.">
+<meta name="theme-color" content="#fbfaf7">
+<meta name="color-scheme" content="light">
+<link rel="canonical" href="https://margin.prayushdesai.com/feedback">
+<link rel="icon" href="/assets/img/icon.png" type="image/png">
+<link rel="apple-touch-icon" href="/assets/img/icon.png">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://margin.prayushdesai.com/">
+<meta property="og:title" content="Margin · Every term, in the margin">
+<meta property="og:description" content="A free Chrome extension that builds your course glossary while you study.">
+<meta property="og:image" content="https://margin.prayushdesai.com/assets/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css?v=dev">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+<nav class="nav scrolled" aria-label="Main">
+  <div class="nav-in">
+    <a class="brand" href="/" aria-label="Margin home"><img src="/assets/img/icon.png" alt="" width="22" height="22"><span>Margin</span></a>
+    <div class="nav-links">
+      <a href="/#how">How it works</a>
+      <a href="/#try">Try it</a>
+      <a href="/#sources">Definitions</a>
+      <a href="/#privacy">Privacy</a>
+    </div>
+    <a class="nav-cta" href="/#download">Coming soon</a>
+  </div>
+</nav>
+<main class="page feedback" id="main">
+<h1>Send feedback</h1>
+<p class="lead">Margin is in beta, and you're one of the first people using it. Tell me what broke, what confused you, or what you wish it did. Short is fine.</p>
+
+<div class="fb-options">
+  <a class="fb-card" id="fbForm" hidden target="_blank" rel="noopener">
+    <strong>Quick form</strong>
+    <span>Two minutes, no account needed.</span>
+  </a>
+  <a class="fb-card" id="fbBug" href="https://github.com/prayush27/margin/issues/new?template=bug_report.yml" target="_blank" rel="noopener">
+    <strong>Report a bug</strong>
+    <span>Something didn't work. Opens a GitHub issue (needs a GitHub account).</span>
+  </a>
+  <a class="fb-card" id="fbIdea" href="https://github.com/prayush27/margin/issues/new?template=feature_request.yml" target="_blank" rel="noopener">
+    <strong>Suggest an idea</strong>
+    <span>Something Margin should do. Also on GitHub.</span>
+  </a>
+</div>
+
+<h2>What helps most</h2>
+<ul>
+  <li>What you were doing (for example, “reading a lecture PDF from Canvas”).</li>
+  <li>What you expected, and what happened instead.</li>
+  <li>A screenshot, if something looked wrong.</li>
+</ul>
+<p>GitHub issues are public, so please don't include private links, your name or anything from a course you're not allowed to share.</p>
+<p class="muted" id="fbVersion"></p>
+</main>
+<script>
+// The extension links here with ?v=<version>. Fill it into the bug report so I know which build you have.
+(function () {
+  var FORM_URL = ""; // set to a Google Form (or similar) link to show the "Quick form" option
+  var p = new URLSearchParams(location.search);
+  var v = (p.get("v") || "").replace(/[^0-9.]/g, "").slice(0, 20);
+  var chrome = (navigator.userAgent.match(/Chrome\/(\d+)/) || [])[1];
+  var versions = [v && "Margin " + v, chrome && "Chrome " + chrome].filter(Boolean).join(", ");
+  if (versions) {
+    var bug = document.getElementById("fbBug");
+    bug.href += "&version=" + encodeURIComponent(versions);
+    document.getElementById("fbVersion").textContent = "You're on " + versions + ".";
+  }
+  if (FORM_URL) {
+    var f = document.getElementById("fbForm");
+    f.href = FORM_URL;
+    f.hidden = false;
+  }
+})();
+</script>
+</main>
+<footer class="foot">
+  <div class="foot-in">
+    <div class="foot-brand"><img src="/assets/img/icon.png" alt="" width="20" height="20"><span>Margin</span><span class="muted">Every term, in the margin.</span></div>
+    <nav class="foot-links" aria-label="Footer">
+      <a href="https://github.com/prayush27/margin">GitHub</a>
+      <a href="https://github.com/prayush27/margin/commits/main">Changelog</a>
+      <a href="/feedback">Feedback</a>
+      <a href="/privacy">Privacy</a>
+    </nav>
+    <p class="legal">Made by <a href="https://prayushdesai.com">Prayush Desai</a>. Margin is free and open source under the MIT license. Not affiliated with Google, OpenStax or NIST. Chrome is a trademark of Google LLC; OpenStax is a trademark of Rice University.</p>
+  </div>
+</footer>
+</body>
+</html>

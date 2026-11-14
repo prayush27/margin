@@ -138,8 +138,26 @@
   font-size: var(--fs-13);
   color: var(--text-3);
 }
-.sidebar-foot {
+.feedback-link {
   margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-13);
+  color: var(--text-2);
+  text-decoration: none;
+}
+.feedback-link:hover {
+  background: var(--hover);
+  color: var(--text);
+}
+.feedback-link svg {
+  width: 14px;
+  height: 14px;
+}
+.sidebar-foot {
   display: flex;
   align-items: center;
   gap: 8px;
