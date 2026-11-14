@@ -359,3 +359,18 @@
     render();
   }
 })();
+
+// In-page links scroll smoothly without leaving "#top" or "#how" in the address bar.
+document.addEventListener("click", (e) => {
+  const a = e.target.closest("a[href]");
+  if (!a || e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+  const url = new URL(a.href, location.href);
+  if (url.origin !== location.origin || url.pathname !== location.pathname) return;
+  const target = url.hash ? document.getElementById(decodeURIComponent(url.hash.slice(1))) : null;
+  if (url.hash && !target) return;
+  e.preventDefault();
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (target) target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  else window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+  if (location.hash) history.replaceState(null, "", location.pathname + location.search);
+});
