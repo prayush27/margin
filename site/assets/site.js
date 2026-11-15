@@ -8,6 +8,18 @@
 
   // ---------- Nav ----------
   const nav = $(".nav");
+  const navLinks = $$(".nav-links a");
+  const navTargets = navLinks.map((a) => [a, $(a.getAttribute("href"))]).filter(([, sec]) => sec);
+  const darkSections = $$("[data-dark]");
+  function updateNav() {
+    nav.classList.toggle("scrolled", scrollY > 24);
+    const mid = nav.getBoundingClientRect().top + nav.offsetHeight / 2;
+    nav.classList.toggle("on-dark", darkSections.some((d) => { const r = d.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; }));
+    // underline the section you're reading
+    let active = null;
+    for (const [a, sec] of navTargets) if (sec.getBoundingClientRect().top <= innerHeight * 0.35) active = a;
+    for (const a of navLinks) a.classList.toggle("is-active", a === active);
+  }
 
   // ---------- Statement: split into words ----------
   const statement = $("#statement");
@@ -52,7 +64,7 @@
   function update() {
     ticking = false;
     const vh = innerHeight;
-    nav.classList.toggle("scrolled", scrollY > 8);
+    updateNav();
 
     if (!reduced && heroStage && heroWindow) {
       const r = heroStage.getBoundingClientRect();

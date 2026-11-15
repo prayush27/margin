@@ -76,17 +76,26 @@ code { font: 0.9em var(--mono); background: var(--bg-2); padding: 2px 6px; borde
 .cta-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 14px 28px; margin-top: 34px; }
 
 /* ---------- Nav ---------- */
-.nav { position: fixed; top: 12px; left: 50%; z-index: 50; width: min(920px, calc(100% - 24px)); height: 54px; transform: translateX(-50%); border-radius: 999px; background: rgba(255, 255, 255, 0.55); backdrop-filter: saturate(180%) blur(22px); -webkit-backdrop-filter: saturate(180%) blur(22px); border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.85), 0 0 0 1px rgba(0, 0, 0, 0.05), 0 8px 28px -10px rgba(0, 0, 0, 0.14); transition: background 300ms, box-shadow 300ms; }
-.nav.scrolled { background: rgba(255, 255, 255, 0.72); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 0 0 1px rgba(0, 0, 0, 0.06), 0 12px 32px -12px rgba(0, 0, 0, 0.18); }
-.nav-in { height: 100%; padding: 0 9px 0 20px; display: flex; align-items: center; gap: 24px; }
-.brand { display: flex; align-items: center; gap: 9px; text-decoration: none; font: 600 17px/1 var(--sans); letter-spacing: -0.02em; }
+/* Nav: a compact glass pill. Hover gives a link a soft fill; the section you're reading gets
+   Margin's amber underline. Shrinks a little once you scroll, and goes dark over dark sections. */
+.nav { position: fixed; z-index: 50; top: 14px; left: 50%; width: max-content; max-width: calc(100% - 24px); height: 50px; transform: translateX(-50%) scale(var(--nav-s, 1)); transform-origin: 50% 0; border-radius: 999px; background: rgba(251, 250, 247, 0.7); -webkit-backdrop-filter: saturate(170%) blur(18px); backdrop-filter: saturate(170%) blur(18px); box-shadow: inset 0 0 0 1px rgba(29, 29, 31, 0.07), 0 12px 32px -14px rgba(40, 30, 10, 0.25); transition: transform 500ms var(--ease), background-color 300ms, color 300ms, box-shadow 300ms; }
+.nav.scrolled { --nav-s: 0.95; }
+.nav.on-dark { background: rgba(28, 28, 30, 0.68); color: var(--night-ink); box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1), 0 12px 32px -14px rgba(0, 0, 0, 0.6); }
+.nav-in { height: 100%; padding: 0 5px 0 14px; display: flex; align-items: center; gap: 6px; }
+.brand { display: flex; align-items: center; gap: 9px; color: inherit; text-decoration: none; font: 600 17px/1 var(--sans); letter-spacing: -0.02em; }
 .brand img { width: 22px; height: 22px; border-radius: 6px; }
-.nav-links { display: flex; gap: 28px; margin-left: auto; }
-.nav-links a { font: 400 14px/1 var(--sans); color: var(--ink-2); text-decoration: none; letter-spacing: 0; transition: color 200ms; }
-.nav-links a:hover { color: var(--ink); }
-.nav-cta { height: 36px; padding: 0 16px; display: inline-flex; align-items: center; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none; font: 600 13px/1 var(--sans); letter-spacing: 0; transition: transform 300ms var(--ease); }
+.nav .brand { font-size: 15px; margin-right: 10px; }
+.nav-links { display: flex; align-items: center; gap: 2px; }
+.nav-links a { position: relative; display: flex; align-items: center; height: 38px; padding: 0 13px; border-radius: 999px; color: inherit; opacity: 0.7; font: 450 14px/1 var(--sans); letter-spacing: 0; text-decoration: none; transition: opacity 200ms, background-color 200ms; }
+.nav-links a:hover { opacity: 1; background: rgba(29, 29, 31, 0.06); }
+.nav.on-dark .nav-links a:hover { background: rgba(255, 255, 255, 0.1); }
+.nav-links a::after { content: ""; position: absolute; left: 13px; right: 13px; bottom: 8px; height: 2px; border-radius: 2px; background: var(--amber); transform: scaleX(0); transition: transform 350ms var(--ease); }
+.nav-links a.is-active { opacity: 1; }
+.nav-links a.is-active::after { transform: scaleX(1); }
+.nav-cta { display: inline-flex; align-items: center; height: 40px; padding: 0 17px; margin-left: 4px; border-radius: 999px; background: var(--ink); color: #fff; text-decoration: none; font: 600 14px/1 var(--sans); letter-spacing: 0; white-space: nowrap; transition: transform 300ms var(--ease), background-color 300ms, color 300ms; }
 .nav-cta:active { transform: scale(0.96); }
-@media (max-width: 720px) { .nav { top: 10px; width: calc(100% - 20px); height: 50px; } .nav-in { padding: 0 7px 0 16px; } .nav-links { display: none; } .nav-cta { margin-left: auto; height: 34px; } }
+.nav.on-dark .nav-cta { background: var(--night-ink); color: var(--ink); }
+@media (max-width: 720px) { .nav { width: calc(100% - 24px); max-width: 440px; top: 10px; } .nav-links { display: none; } .nav-cta { margin-left: auto; height: 38px; } }
 
 /* ---------- Hero ---------- */
 .hero { position: relative; padding: clamp(116px, 16vh, 168px) var(--gutter) 0; text-align: center; overflow: hidden; }
@@ -369,3 +378,4 @@ mark.u { background: linear-gradient(var(--mark), var(--mark)) 0 0 / 0% 100% no-
 .fb-card span { color: var(--ink-2); font-size: 15px; line-height: 1.45; }
 .fb-card strong::after { content: " →"; color: var(--ink-3); }
 .page .muted { color: var(--ink-3); font-size: 14px; }
+.nav.on-dark .brand img { box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.18); }
