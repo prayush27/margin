@@ -8,7 +8,36 @@
 
   // ---------- Nav ----------
   const nav = $(".nav");
+  const navBar = $(".nav-links");
   const navLinks = $$(".nav-links a");
+  const pill = $(".nav-pill");
+  const line = $(".nav-line");
+  // Glide an indicator to a link. Uses layout offsets, so the nav's own scale doesn't skew it.
+  // If the indicator is hidden, it appears in place (no slide in from the last spot).
+  function glide(el, link, inset = 0) {
+    if (!el) return;
+    if (!link) { el.style.opacity = "0"; el.dataset.on = ""; return; }
+    const x = link.offsetLeft + inset, w = link.offsetWidth - inset * 2;
+    if (!el.dataset.on) {
+      el.classList.add("no-anim");
+      el.style.transform = `translateX(${x}px)`;
+      el.style.width = `${w}px`;
+      el.offsetWidth; // apply position before turning motion back on
+      el.classList.remove("no-anim");
+    } else {
+      el.style.transform = `translateX(${x}px)`;
+      el.style.width = `${w}px`;
+    }
+    el.style.opacity = "1";
+    el.dataset.on = "1";
+  }
+  let hovered = null;
+  navLinks.forEach((a) => {
+    a.addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") glide(pill, (hovered = a)); });
+    a.addEventListener("focus", () => { if (a.matches(":focus-visible")) glide(pill, (hovered = a)); });
+    a.addEventListener("blur", () => { if (hovered === a && !navBar.matches(":hover")) glide(pill, (hovered = null)); });
+  });
+  navBar?.addEventListener("pointerleave", () => glide(pill, (hovered = null)));
   const navTargets = navLinks.map((a) => [a, $(a.getAttribute("href"))]).filter(([, sec]) => sec);
   const darkSections = $$("[data-dark]");
   function updateNav() {
@@ -18,8 +47,16 @@
     // underline the section you're reading
     let active = null;
     for (const [a, sec] of navTargets) if (sec.getBoundingClientRect().top <= innerHeight * 0.35) active = a;
-    for (const a of navLinks) a.classList.toggle("is-active", a === active);
+    const prev = navLinks.find((a) => a.classList.contains("is-active")) || null;
+    if (active !== prev) {
+      for (const a of navLinks) a.classList.toggle("is-active", a === active);
+      glide(line, active, 13);
+    }
   }
+  // Fonts and resizes change link widths; keep the indicators lined up.
+  const realign = () => { if (line?.dataset.on) glide(line, navLinks.find((a) => a.classList.contains("is-active")), 13); if (hovered) glide(pill, hovered); };
+  addEventListener("resize", realign);
+  document.fonts?.ready.then(realign);
 
   // ---------- Statement: split into words ----------
   const statement = $("#statement");
