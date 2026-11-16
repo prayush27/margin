@@ -35,6 +35,7 @@ CI runs both on every push and pull request.
 | `src/hub/` | Glossary, quiz, PDFs and settings |
 | `data/` | Bundled definitions (see `data/SOURCES.md`) |
 | `tools/` | Data builders, checks and packaging |
+| `site/` | The website ([margin.prayushdesai.com](https://margin.prayushdesai.com)): plain HTML, CSS and JS, deployed by `.github/workflows/pages.yml` |
 
 ## Guidelines
 
@@ -43,6 +44,7 @@ CI runs both on every push and pull request.
 - **Don't touch page HTML.** Highlights use `CSS.highlights`; UI lives in a closed shadow root.
 - **Match the design.** Use the tokens in `src/styles/tokens.css` and support light and dark mode.
 - Add a test in `tests/run.mjs` for logic changes.
+- **On the website,** keep motion tied to what Margin does (the demo, the how-it-works stage), respect `prefers-reduced-motion`, and skip generic effects like fade-in-on-scroll.
 
 ## Refreshing bundled definitions
 

@@ -14,7 +14,7 @@ Save a term once and see its definition on Canvas, course sites and lecture PDFs
 ![No tracking](https://img.shields.io/badge/tracking-none-22a06b)
 ![Dependencies](https://img.shields.io/badge/dependencies-0-1d1d1f)
 
-[Features](#features) · [Where definitions come from](#where-definitions-come-from) · [Privacy](#privacy) · [How it works](#how-it-works) · [Contributing](CONTRIBUTING.md)
+**[Website](https://margin.prayushdesai.com)** · [Try it in your browser](https://margin.prayushdesai.com/#try) · [Features](#features) · [Where definitions come from](#where-definitions-come-from) · [Privacy](#privacy) · [How it works](#how-it-works) · [Contributing](CONTRIBUTING.md)
 
 <br>
 
@@ -101,7 +101,7 @@ Every suggestion is labelled with its source and links back to it. Licenses and 
 
 ## Install
 
-Margin is coming soon to the **Chrome Web Store**, which will be the only official place to get it.
+Margin is coming soon to the **Chrome Web Store**, which will be the only official place to get it. Until then, you can [try the live demo on the website](https://margin.prayushdesai.com/#try): hover a term, save a new one and take a practice quiz, no install needed.
 
 ### Keyboard shortcuts
 
@@ -162,6 +162,8 @@ node tools/check.mjs      # manifest references, imports and bundled data
 ```
 
 No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaScriptCore. See [CONTRIBUTING.md](CONTRIBUTING.md) for the project layout and guidelines.
+
+The website lives in [`site/`](site): plain HTML, CSS and JS with no build step, deployed to [margin.prayushdesai.com](https://margin.prayushdesai.com) by the [Website workflow](.github/workflows/pages.yml) on every push to `main` that touches it. Preview it with `python3 -m http.server -d site`.
 
 ## Roadmap
 
