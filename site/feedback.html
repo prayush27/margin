@@ -11,31 +11,29 @@
 <link rel="icon" href="/assets/img/icon.png" type="image/png">
 <link rel="apple-touch-icon" href="/assets/img/icon.png">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://margin.prayushdesai.com/">
+<meta property="og:url" content="https://margin.prayushdesai.com/feedback">
 <meta property="og:title" content="Margin · Every term, in the margin">
 <meta property="og:description" content="A free Chrome extension that builds your course glossary while you study.">
 <meta property="og:image" content="https://margin.prayushdesai.com/assets/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="/assets/fonts/Newsreader.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=dev">
-<script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
-<nav class="nav scrolled" aria-label="Main">
-  <div class="nav-in">
+<a class="skip" href="#main">Skip to content</a>
+<header class="bar" id="bar">
+  <div class="bar-in">
     <a class="brand" href="/" aria-label="Margin home"><img src="/assets/img/icon.png" alt="" width="22" height="22"><span>Margin</span></a>
-    <div class="nav-links">
+    <nav class="bar-links" aria-label="Main">
       <a href="/#how">How it works</a>
-      <a href="/#try">Try it</a>
       <a href="/#sources">Definitions</a>
       <a href="/#privacy">Privacy</a>
-    </div>
-    <a class="nav-cta" href="/#download">Coming soon</a>
+      <a class="ext" href="https://github.com/prayush27/margin">GitHub<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+    </nav>
+    <a class="bar-cta" href="/#get">Coming soon</a>
   </div>
-</nav>
-<main class="page feedback" id="main">
+</header>
+<main tabindex="-1" class="page feedback" id="main">
 <h1>Send feedback</h1>
 <p class="lead">Margin is in beta, and you're one of the first people using it. Tell me what broke, what confused you, or what you wish it did. Short is fine.</p>
 
@@ -83,10 +81,9 @@
   }
 })();
 </script>
-</main>
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-brand"><img src="/assets/img/icon.png" alt="" width="20" height="20"><span>Margin</span><span class="muted">Every term, in the margin.</span></div>
+    <div class="foot-brand"><img src="/assets/img/icon.png" alt="" width="18" height="18"><span>Margin</span></div>
     <nav class="foot-links" aria-label="Footer">
       <a href="https://github.com/prayush27/margin">GitHub</a>
       <a href="https://github.com/prayush27/margin/commits/main">Changelog</a>

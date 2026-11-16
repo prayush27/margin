@@ -16,246 +16,219 @@
 <meta property="og:description" content="A free Chrome extension that builds your course glossary while you study.">
 <meta property="og:image" content="https://margin.prayushdesai.com/assets/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preload" href="assets/fonts/Newsreader.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="assets/site.css?v=dev">
-<script>document.documentElement.classList.add("js")</script>
 </head>
 <body>
 <a class="skip" href="#main">Skip to content</a>
 
-<nav class="nav" aria-label="Main">
-  <div class="nav-in">
+<header class="bar" id="bar">
+  <div class="bar-in">
     <a class="brand" href="/" aria-label="Margin home"><img src="assets/img/icon.png" alt="" width="22" height="22"><span>Margin</span></a>
-    <div class="nav-links">
+    <nav class="bar-links" aria-label="Main">
       <a href="#how">How it works</a>
-      <a href="#try">Try it</a>
       <a href="#sources">Definitions</a>
       <a href="#privacy">Privacy</a>
-      <span class="nav-pill" aria-hidden="true"></span>
-      <span class="nav-line" aria-hidden="true"></span>
-    </div>
-    <a class="nav-cta" href="#download">Coming soon</a>
-  </div>
-</nav>
-
-<main id="main">
-
-<!-- ============ HERO ============ -->
-<header class="hero" id="top">
-  <h1 class="hero-title" aria-label="Every term, in the margin.">
-    <span class="w" style="--d:1">Every</span> <span class="w" style="--d:2">term,</span><br>
-    <span class="w" style="--d:3">in</span> <span class="w" style="--d:4">the</span> <span class="w hl" style="--d:5">margin.</span>
-  </h1>
-  <p class="lede hero-in" style="--d:7">Save a term once. Margin underlines it on your course pages and lecture PDFs, with your definition one hover away.</p>
-  <div class="cta-row hero-in" style="--d:8">
-    <a class="btn btn-primary" href="#download">Coming soon to Chrome</a>
-    <a class="btn-link" href="#how">See how it works <span aria-hidden="true">›</span></a>
-  </div>
-  <p class="fine hero-in" style="--d:9">Free forever · No account · Your notes stay on your laptop</p>
-
-  <div class="hero-stage" id="heroStage">
-    <div class="window" id="heroWindow">
-      <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">cs400 · week 9 notes</span><span></span></div>
-      <article class="doc">
-        <p class="doc-kicker">CS 400 · Lecture notes</p>
-        <h3 class="doc-title">Heaps and Priority Queues</h3>
-        <p>Last week we used a <mark class="u" style="--i:0">binary search tree</mark> to keep keys in sorted order. This week we trade full ordering for speed: a <mark class="u" style="--i:1">priority queue</mark> only needs to hand back the most important item next.</p>
-        <p>The usual way to build one is with a <mark class="u" style="--i:2">heap</mark>. Because a <mark class="u" style="--i:3">heap</mark> is a <mark class="u" style="--i:4">complete binary tree</mark>, it fits in an array with no pointers, unlike a <mark class="u" style="--i:5">hash table</mark> with chaining.</p>
-        <div class="card hero-card" aria-hidden="true">
-          <div class="card-head"><span class="term">heap</span><span class="chip"><i style="background:#e0962b"></i>CS 400</span></div>
-          <p class="card-def">A complete tree where every node has a key more extreme than or equal to the key of its parent.</p>
-          <div class="card-meta"><span>Week 9 · Heaps and Priority Queues</span><span>via NIST</span></div>
-        </div>
-      </article>
-    </div>
+      <a class="ext" href="https://github.com/prayush27/margin">GitHub<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>
+      <span class="bar-line" aria-hidden="true"></span>
+    </nav>
+    <a class="bar-cta" href="#get">Coming soon</a>
   </div>
 </header>
 
-<!-- ============ STATEMENT ============ -->
-<section class="statement" aria-label="Why Margin">
-  <p class="scrub-text" id="statement">Every class has its own language. Margin helps you learn it where you read it, in slides, PDFs, course pages and notes, then hands it back to you as a glossary and a quiz.</p>
+<main id="main" tabindex="-1">
+
+<!-- Hero: the headline's last word is a saved term, and its note sits in the margin -->
+<section class="sheet hero" aria-labelledby="title">
+  <h1 id="title" class="col-text"><span class="sr">Every term, in the margin.</span><span aria-hidden="true"><span class="w" style="--d:0">Every</span> <span class="w" style="--d:1">term,</span> <span class="nw"><span class="w" style="--d:2">in</span> <span class="w" style="--d:3">the</span></span> <span class="w" style="--d:4"><span class="hero-term">margin</span>.</span></span></h1>
+  <div class="note hero-note">
+    <span class="note-term">margin</span><span class="note-chip"><i></i>ENGL 101</span>
+    <span class="note-def">The blank space beside the text on a page, where readers write what they want to remember.</span>
+    <span class="note-src">via Wiktionary</span>
+  </div>
+  <div class="col-text hero-in">
+    <p class="lede">A free Chrome extension for the words your classes keep using. Save a term once, and Margin underlines it on your course pages and lecture PDFs with your definition one hover away.</p>
+    <div class="cta-row">
+      <span class="btn" aria-disabled="true">Coming soon to Chrome</span>
+      <a class="link" href="#try">Try it on this page<span aria-hidden="true"> ↓</span></a>
+    </div>
+    <p class="fine">Free, with no account. Your notes stay on your laptop.</p>
+  </div>
 </section>
 
-<!-- ============ HOW IT WORKS (pinned stage) ============ -->
-<section class="how" id="how" aria-label="How it works">
-  <div class="how-grid">
+<!-- Live demo -->
+<section class="demo-wrap" id="try" aria-label="Try Margin">
+  <div class="demo" id="demo">
+    <div class="frame">
+      <div class="surface demo-window">
+        <div class="demo-top">
+          <div class="demo-tabs" role="group" aria-label="Pick a course">
+            <button type="button" data-course="cs" aria-pressed="true"><i style="background:var(--cs)"></i>CS 400</button>
+            <button type="button" data-course="stat" aria-pressed="false"><i style="background:var(--stat)"></i>STAT 240</button>
+            <button type="button" data-course="psych" aria-pressed="false"><i style="background:var(--psych)"></i>PSYCH 202</button>
+          </div>
+          <span class="url" id="demoUrl">cs400 · lecture notes</span>
+        </div>
+        <article class="doc demo-doc" id="demoDoc"></article>
+      </div>
+    </div>
+    <div class="demo-cap">
+      <p>Hover a <span class="k-saved">highlighted term</span> to read it. Click a <span class="k-cand">dotted one</span> to save it.</p>
+      <p class="demo-status" id="demoStatus" aria-live="polite">2 of 4 terms saved</p>
+    </div>
+  </div>
+</section>
+
+<!-- How it works -->
+<section class="sheet" id="how" aria-labelledby="how-h">
+  <p class="col-text big" id="statement">Every class has its own language. Margin helps you learn it where you read it, then hands it back to you as a glossary and a quiz.</p>
+
+  <h2 id="how-h" class="col-text h2">How it works</h2>
+
+  <div class="how col-wide">
     <div class="how-steps">
+      <span class="how-track" aria-hidden="true"><i></i></span>
       <div class="step" data-step="1">
-        <p class="eyebrow">How it works</p>
-        <span class="num">01</span>
-        <h2>Select a term.</h2>
-        <p>Highlight any word on any page and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd>, click the pill, or right-click. Margin remembers where you found it, down to the PDF page.</p>
+        <h3><span class="num">1</span>Select a term</h3>
+        <p>Highlight a word on any page and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd>, click the button that appears, or right-click. Margin remembers where you found it, down to the PDF page.</p>
       </div>
       <div class="step" data-step="2">
-        <span class="num">02</span>
-        <h2>Write it, or find it.</h2>
-        <p>Write the definition in your own words, or let Margin find one that fits your class: textbook glossaries for psych, NIST for CS, science databases for bio and stats.</p>
+        <h3><span class="num">2</span>Write it, or find it</h3>
+        <p>Write the definition in your own words, or let Margin find one that fits the class: textbook glossaries for psych, NIST for CS, science databases for bio and stats.</p>
       </div>
       <div class="step" data-step="3">
-        <span class="num">03</span>
-        <h2>See it wherever you study.</h2>
-        <p>From then on the term is underlined on Canvas, course pages and every lecture PDF. Hover it and your definition is right there, with the course and where you first saw it. Your email and YouTube stay untouched.</p>
+        <h3><span class="num">3</span>See it wherever you study</h3>
+        <p>From then on the term is highlighted on Canvas, course pages and every lecture PDF. Hover it and your definition is there, with the course and where you first saw it. Your email and YouTube stay untouched.</p>
       </div>
     </div>
     <div class="how-stage-wrap">
-      <div class="how-stage" id="howStage" data-active="1">
-        <div class="window small">
-          <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url">canvas · week 9</span><span></span></div>
-          <article class="doc">
+      <div class="how-stage" id="howStage" data-active="1" aria-hidden="true">
+        <div class="frame"><div class="surface">
+          <div class="stage-top"><span class="url">canvas · cs 400 · week 9</span></div>
+          <article class="doc stage-doc">
             <p>The usual way to build a priority queue is with a <span class="t heap1">heap</span>. Inserting and removing both take logarithmic time.</p>
             <p>Because a <span class="t heap2">heap</span> is a complete binary tree, it lives happily in an array.</p>
-            <button class="pill" tabindex="-1" aria-hidden="true"><svg viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></svg>Save term <kbd>⌥⇧S</kbd></button>
-            <div class="card save-card" aria-hidden="true">
+            <span class="pill"><svg viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></svg>Save term<kbd>⌥⇧S</kbd></span>
+            <div class="card save-card stage-card">
               <div class="save-head"><span class="logo"></span>Save to Margin</div>
-              <div class="field term-field">heap</div>
+              <div class="field">heap</div>
               <div class="def-row"><span>Definition</span><span class="seg"><b>Write my own</b><b class="on">Find one</b></span></div>
-              <div class="sugg on"><span class="src"><b>NIST</b> · Algorithms and Data Structures</span>A complete tree where every node has a key more extreme than its parent's.</div>
+              <div class="sugg on"><span class="src"><b>NIST</b> · Algorithms and Data Structures</span>A complete tree where every node has a key more extreme than its parent’s.</div>
               <div class="sugg"><span class="src"><b>OpenStax</b> · Introduction to Computer Science</span>Stores dynamically allocated data.</div>
-              <div class="sugg"><span class="src"><b>Wikipedia</b> · Heap (data structure)</span>A tree-based data structure that satisfies the heap property.</div>
               <div class="save-foot"><span class="course">CS 400</span><span class="btn-mini">Save</span></div>
             </div>
-            <div class="card tip-card" aria-hidden="true">
-              <div class="card-head"><span class="term">heap</span><span class="chip"><i style="background:#e0962b"></i>CS 400</span></div>
+            <div class="card tip-card stage-card">
+              <div class="card-head"><span class="term">heap</span><span class="chip"><i style="background:var(--cs)"></i>CS 400</span></div>
               <p class="card-def">A complete tree where every node has a key more extreme than or equal to the key of its parent.</p>
               <div class="card-meta"><span>Week 9 notes</span><span>via NIST</span></div>
             </div>
           </article>
-        </div>
+        </div></div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ============ TRY IT ============ -->
-<section class="try" id="try" aria-label="Try Margin">
-  <div class="section-head reveal">
-    <p class="eyebrow">Try it right here</p>
-    <h2 class="h2">No install needed to see it.</h2>
-    <p class="sub">Hover an <span class="demo-key saved">underlined term</span>. Then click a <span class="demo-key cand">dotted word</span> to save it, and watch it light up everywhere.</p>
+<!-- Sources -->
+<section class="sheet" id="sources" aria-labelledby="src-h">
+  <h2 id="src-h" class="col-text h2">Definitions that know your class</h2>
+  <p class="col-text">Margin reads your course code, so <span class="hl">heap</span> in CS 400 means the data structure, and <span class="hl">elasticity</span> in ECON 101 isn’t about rubber bands.</p>
+  <div class="note">
+    <span class="note-num"><span class="count" data-to="24000">24,000</span>+</span>
+    <span class="note-def">textbook definitions ship inside Margin and work offline: 64 free OpenStax textbooks and 835 entries from NIST.</span>
   </div>
-  <div class="demo reveal" id="demo">
-    <div class="demo-tabs" role="tablist" aria-label="Pick a course">
-      <button role="tab" data-course="cs" aria-selected="true"><i style="background:#e0962b"></i>CS 400</button>
-      <button role="tab" data-course="stat" aria-selected="false"><i style="background:#3b82f6"></i>STAT 240</button>
-      <button role="tab" data-course="psych" aria-selected="false"><i style="background:#22a06b"></i>PSYCH 202</button>
-    </div>
-    <div class="window demo-window">
-      <div class="win-bar"><span class="dots"><i></i><i></i><i></i></span><span class="url" id="demoUrl">cs400 · lecture notes</span><span></span></div>
-      <article class="doc demo-doc" id="demoDoc"></article>
-    </div>
-    <p class="demo-status" id="demoStatus" aria-live="polite">2 of 4 terms saved</p>
-  </div>
+  <table class="col-text sources">
+    <caption class="sr">Where definitions come from, by course</caption>
+    <thead><tr><th scope="col">Course</th><th scope="col">Where Margin looks</th></tr></thead>
+    <tbody>
+      <tr><td><i style="background:var(--cs)"></i>CS 400</td><td>NIST algorithms dictionary, OpenStax Intro to CS</td></tr>
+      <tr><td><i style="background:var(--stat)"></i>STAT 240</td><td>Introductory Statistics, Statistics Ontology</td></tr>
+      <tr><td><i style="background:var(--bio)"></i>BIO 152</td><td>Biology 2e, Gene Ontology, MeSH</td></tr>
+      <tr><td><i style="background:var(--psych)"></i>PSYCH 202</td><td>Psychology 2e, MeSH</td></tr>
+      <tr><td><i style="background:var(--econ)"></i>ECON 101</td><td>Principles of Economics</td></tr>
+    </tbody>
+  </table>
 </section>
 
-<!-- ============ SOURCES / BENTO ============ -->
-<section class="sources" id="sources" aria-label="Where definitions come from">
-  <div class="section-head reveal">
-    <p class="eyebrow">Find one</p>
-    <h2 class="h2">Definitions that know your class.</h2>
-    <p class="sub">Margin reads your course code, so “heap” in CS 400 means the data structure, and “elasticity” in ECON 101 isn't about rubber bands.</p>
-  </div>
-  <div class="bento">
-    <div class="tile tile-wide reveal">
-      <p class="tile-k">Sources, matched to the subject</p>
-      <ul class="map">
-        <li><span class="code">CS 400</span><span class="arrow"></span><span class="srcs">NIST algorithms dictionary · OpenStax Intro CS</span></li>
-        <li><span class="code">STAT 240</span><span class="arrow"></span><span class="srcs">Introductory Statistics · Statistics Ontology</span></li>
-        <li><span class="code">BIO 152</span><span class="arrow"></span><span class="srcs">Biology 2e · Gene Ontology · MeSH</span></li>
-        <li><span class="code">PSYCH 202</span><span class="arrow"></span><span class="srcs">Psychology 2e · MeSH</span></li>
-        <li><span class="code">ECON 101</span><span class="arrow"></span><span class="srcs">Principles of Economics</span></li>
-      </ul>
-    </div>
-    <div class="tile stat stat-wide reveal"><p class="big"><span class="count" data-to="24">0</span>K+</p><p>textbook definitions, built in and offline</p></div>
-    <div class="tile stat reveal"><p class="big"><span class="count" data-to="64">0</span></p><p>free college textbooks from OpenStax</p></div>
-    <div class="tile stat reveal"><p class="big"><span class="count" data-to="835">0</span></p><p>CS definitions from NIST</p></div>
-    <div class="tile stat dark reveal"><p class="big">0</p><p>sign-ups, word limits, or paywalls</p></div>
-  </div>
-</section>
-
-<!-- ============ PDF (dark) ============ -->
-<section class="pdf" aria-label="PDF viewer" data-dark>
-  <div class="section-head reveal">
-    <p class="eyebrow">PDF viewer</p>
-    <h2 class="h2">Built for the PDFs your professors actually post.</h2>
-    <p class="sub">Say yes once and lecture slides open in Margin's own viewer, with your terms underlined, the lecture's key terms picked out for you, and dark pages for late nights.</p>
-  </div>
-  <div class="pdf-shot" id="pdfShot">
-    <img src="assets/img/pdf-viewer.png" alt="Margin's PDF viewer on a heaps lecture, with a saved term underlined and the Suggested panel listing heap, priority queue and heapsort with their definitions" loading="lazy" width="1280" height="800">
-  </div>
-  <div class="trio">
-    <div class="reveal"><h3>Key terms, found for you</h3><p>Margin reads the lecture and suggests its key terms, with definitions from your professor's slides or the course textbook. Save five in one click.</p></div>
-    <div class="reveal"><h3>Back to the exact page</h3><p>A side panel lists your saved terms in the file with links to each page, and every term remembers the slide you found it on.</p></div>
-    <div class="reveal"><h3>Web or local</h3><p>Works on PDFs from course sites and on the ones sitting in your Downloads folder.</p></div>
-  </div>
-</section>
-
-<!-- ============ CLASS SIDEBAR ============ -->
-<section class="side" aria-label="Class sidebar">
-  <div class="section-head reveal">
-    <p class="eyebrow">Class sidebar</p>
-    <h2 class="h2">One class. Every term. Right beside you.</h2>
-    <p class="sub">Open the sidebar and it shows every term you've saved for the class you're working on, with the ones on this page at the top. Switch tabs and it keeps up.</p>
-  </div>
-  <figure class="side-shot reveal">
-    <picture>
-      <source media="(max-width: 640px)" srcset="assets/img/sidebar-panel.png" width="680" height="1520">
-      <img src="assets/img/sidebar.png" alt="A CS 400 course page with heap, priority queue and binary search tree underlined, and Margin's class sidebar listing the five terms on the page above the rest of the class" loading="lazy" width="2482" height="1608">
-    </picture>
+<!-- PDF viewer -->
+<section class="sheet" aria-labelledby="pdf-h">
+  <h2 id="pdf-h" class="col-text h2">Built for the PDFs your professors post</h2>
+  <p class="col-text">Say yes once and lecture slides open in Margin’s own viewer, with your terms highlighted and the lecture’s key terms picked out for you.</p>
+  <figure class="col-wide shot">
+    <div class="frame"><div class="surface"><picture><source media="(max-width: 640px)" srcset="assets/img/pdf-panel.png" width="600" height="1496"><img src="assets/img/pdf-viewer.png" alt="Margin’s PDF viewer on a heaps lecture, with a saved term highlighted and a Suggested panel listing heap, priority queue and heapsort with their definitions" loading="lazy" width="2560" height="1600"></picture></div></div>
   </figure>
-  <div class="side-points">
-    <div class="reveal"><h3>Knows the class</h3><p>Open a course page and the sidebar switches to that class on its own.</p></div>
-    <div class="reveal"><h3>On this page, first</h3><p>The terms on the page you're reading come first. Click one to jump to it.</p></div>
-    <div class="reveal"><h3>One shortcut</h3><p>Press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>M</kbd> to open it. Quiz the whole class from the bottom.</p></div>
-  </div>
+  <dl class="col-text points">
+    <div><dt>Key terms, found for you</dt><dd>Margin reads the lecture and suggests its key terms, with definitions from the slides or the course textbook. Save five in one click.</dd></div>
+    <div><dt>Back to the exact page</dt><dd>A side panel lists the terms in the file with links to each page, and every term remembers the slide you found it on.</dd></div>
+    <div><dt>Web or local</dt><dd>Works on PDFs from course sites and on the ones sitting in your Downloads folder, with dark pages for late nights.</dd></div>
+  </dl>
 </section>
 
-<!-- ============ QUIZ ============ -->
-<section class="quiz" aria-label="Glossary and quiz">
-  <div class="quiz-grid">
-    <div class="reveal">
-      <p class="eyebrow">Glossary and quiz</p>
-      <h2 class="h2">By Friday, your study guide already exists.</h2>
-      <p class="sub">Every term lands in a glossary sorted by course. When it's time to review, Margin quizzes you, and the ones you miss come back first.</p>
-      <p class="fine">Export to CSV for Anki or Quizlet anytime.</p>
+<!-- Sidebar -->
+<section class="sheet" aria-labelledby="side-h">
+  <h2 id="side-h" class="col-text h2">One class, right beside you</h2>
+  <p class="col-text">Open the sidebar with <kbd>⌥</kbd><kbd>⇧</kbd><kbd>M</kbd> and it lists every term you’ve saved for the class you’re working on, with the ones on this page first. Open a different course and it switches on its own.</p>
+  <figure class="col-wide shot">
+    <div class="frame"><div class="surface">
+      <picture>
+        <source media="(max-width: 640px)" srcset="assets/img/sidebar-panel.png" width="680" height="1520">
+        <img src="assets/img/sidebar.png" alt="A CS 400 course page with heap, priority queue and binary search tree highlighted, and Margin’s class sidebar listing the five terms on the page above the rest of the class" loading="lazy" width="2482" height="1608">
+      </picture>
+    </div></div>
+  </figure>
+</section>
+
+<!-- Quiz -->
+<section class="sheet quiz" aria-labelledby="quiz-h">
+  <div class="col-text">
+    <h2 id="quiz-h" class="h2">By Friday, your study guide already exists</h2>
+    <p>Every term lands in a glossary sorted by course. When it’s time to review, Margin quizzes you, and the ones you miss come back first. Export to CSV for Anki or Quizlet whenever you like.</p>
+  </div>
+  <div class="flip" id="flip" role="group" aria-label="Practice quiz">
+    <div class="flip-in">
+      <button class="face front" type="button">
+        <span class="q" id="qMeta">PSYCH 202 · 1 of 5</span>
+        <span class="prompt" id="qPrompt">Discomfort from a conflict between what you do and what you believe.</span>
+        <span class="hint" id="qHint">Tap to see the term</span>
+      </button>
+      <div class="face back" aria-hidden="true">
+        <span class="q" id="qCourse">PSYCH 202</span>
+        <span class="answer" id="qAnswer">cognitive dissonance</span>
+        <span class="grade"><button type="button" data-grade="miss" tabindex="-1">Missed it</button><button type="button" class="ok" data-grade="got" tabindex="-1">Got it</button></span>
+      </div>
     </div>
-    <button class="flip reveal" id="flip" aria-label="Flip the card">
-      <span class="flip-in">
-        <span class="face front"><span class="q">What's the term?</span><span class="prompt">Psychological discomfort from a conflict between your behaviors and your beliefs.</span><span class="hint">Tap to reveal</span></span>
-        <span class="face back"><span class="q">PSYCH 202</span><span class="answer">cognitive dissonance</span><span class="grade"><b>Missed it</b><b class="ok">Got it</b></span></span>
-      </span>
-    </button>
   </div>
+  <p class="quiz-score" id="qScore" aria-live="polite"></p>
 </section>
 
-<!-- ============ PRIVACY ============ -->
-<section class="privacy" id="privacy" aria-label="Privacy">
-  <div class="lock reveal" aria-hidden="true"><svg viewBox="0 0 48 48"><rect x="10" y="21" width="28" height="20" rx="5"/><path d="M16 21v-5a8 8 0 0 1 16 0v5"/></svg></div>
-  <h2 class="h2 center reveal">Your notes never leave your laptop.</h2>
-  <p class="sub center reveal">Everything is saved in your own browser. No account, no server, no tracking. The only time Margin goes online is when you ask it to find a definition, and then it sends just the term.</p>
-  <ul class="chips reveal">
-    <li>No account</li><li>No server</li><li>No tracking</li><li>No ads</li><li>Open source</li>
-  </ul>
-  <p class="center reveal"><a class="btn-link" href="privacy.html">Read the privacy policy <span aria-hidden="true">›</span></a></p>
+<!-- Privacy -->
+<section class="sheet" id="privacy" aria-labelledby="priv-h">
+  <h2 id="priv-h" class="col-text h2">Your notes never leave your laptop</h2>
+  <p class="col-text">Everything is saved in your own browser. There’s no account, no server, no tracking and no ads. The only time Margin goes online is when you ask it to find a definition, and then it sends just the term.</p>
+  <div class="note">
+    <span class="note-def">Margin is open source. You can read every line on <a class="ext" href="https://github.com/prayush27/margin">GitHub<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 8.5l5-5M4.5 3.5h4v4"/></svg></a>.</span>
+  </div>
+  <p class="col-text"><a class="link" href="privacy.html">Read the privacy policy</a></p>
 </section>
 
-<!-- ============ DOWNLOAD ============ -->
-<section class="download" id="download" aria-label="Get Margin">
-  <img class="dl-icon reveal" src="assets/img/icon.png" alt="" width="88" height="88">
-  <h2 class="h2 center reveal">Free. No word limits.<br>No catch.</h2>
-  <p class="lede center reveal" style="margin-inline:auto">Margin is coming to the Chrome Web Store. It will be the only place to get it.</p>
-  <div class="cta-row center reveal">
-    <span class="btn btn-primary is-soon" aria-disabled="true">Coming soon to Chrome</span>
+<!-- Get it -->
+<section class="sheet get" id="get" aria-labelledby="get-h">
+  <div class="col-text">
+    <img class="get-icon" src="assets/img/icon.png" alt="" width="56" height="56">
+    <h2 id="get-h" class="h2">Free, with no word limits</h2>
+    <p>Margin is on its way to the Chrome Web Store, which will be the only place to get it.</p>
+    <div class="cta-row">
+      <span class="btn" aria-disabled="true">Coming soon to Chrome</span>
+      <span class="fine">For Chrome 120 or newer</span>
+    </div>
   </div>
-  <p class="fine center reveal">For Chrome 120 or newer</p>
 </section>
 
 </main>
 
 <footer class="foot">
   <div class="foot-in">
-    <div class="foot-brand"><img src="assets/img/icon.png" alt="" width="20" height="20"><span>Margin</span><span class="muted">Every term, in the margin.</span></div>
+    <div class="foot-brand"><img src="assets/img/icon.png" alt="" width="18" height="18"><span>Margin</span></div>
     <nav class="foot-links" aria-label="Footer">
       <a href="https://github.com/prayush27/margin">GitHub</a>
       <a href="https://github.com/prayush27/margin/commits/main">Changelog</a>

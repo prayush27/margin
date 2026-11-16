@@ -1,4 +1,4 @@
-// Margin website: scroll-linked motion, reveals and the live demo. No dependencies.
+// Margin website: the live demo, the flip card and a few small touches. No dependencies.
 (() => {
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const $ = (s, el = document) => el.querySelector(s);
@@ -6,76 +6,64 @@
   const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
   const esc = (s) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-  // ---------- Nav ----------
-  const nav = $(".nav");
-  const navBar = $(".nav-links");
-  const navLinks = $$(".nav-links a");
-  const pill = $(".nav-pill");
-  const line = $(".nav-line");
-  // Glide an indicator to a link. Uses layout offsets, so the nav's own scale doesn't skew it.
-  // If the indicator is hidden, it appears in place (no slide in from the last spot).
-  function glide(el, link, inset = 0) {
-    if (!el) return;
-    if (!link) { el.style.opacity = "0"; el.dataset.on = ""; return; }
-    const x = link.offsetLeft + inset, w = link.offsetWidth - inset * 2;
-    if (!el.dataset.on) {
-      el.classList.add("no-anim");
-      el.style.transform = `translateX(${x}px)`;
-      el.style.width = `${w}px`;
-      el.offsetWidth; // apply position before turning motion back on
-      el.classList.remove("no-anim");
-    } else {
-      el.style.transform = `translateX(${x}px)`;
-      el.style.width = `${w}px`;
-    }
-    el.style.opacity = "1";
-    el.dataset.on = "1";
+  // ---------- Shortcuts read the way your keyboard does ----------
+  if (!/Mac|iPhone|iPad/.test(navigator.platform || navigator.userAgent)) {
+    $$("kbd").forEach((k) => {
+      const t = k.textContent;
+      if (t === "⌥") k.textContent = "Alt";
+      else if (t === "⇧") k.textContent = "Shift";
+      else if (t.length > 1) k.textContent = t.replace("⌥", "Alt+").replace("⇧", "Shift+");
+    });
   }
-  let hovered = null;
-  navLinks.forEach((a) => {
-    a.addEventListener("pointerenter", (e) => { if (e.pointerType !== "touch") glide(pill, (hovered = a)); });
-    a.addEventListener("focus", () => { if (a.matches(":focus-visible")) glide(pill, (hovered = a)); });
-    a.addEventListener("blur", () => { if (hovered === a && !navBar.matches(":hover")) glide(pill, (hovered = null)); });
-  });
-  navBar?.addEventListener("pointerleave", () => glide(pill, (hovered = null)));
-  const navTargets = navLinks.map((a) => [a, $(a.getAttribute("href"))]).filter(([, sec]) => sec);
-  const darkSections = $$("[data-dark]");
-  function updateNav() {
-    nav.classList.toggle("scrolled", scrollY > 24);
-    const mid = nav.getBoundingClientRect().top + nav.offsetHeight / 2;
-    nav.classList.toggle("on-dark", darkSections.some((d) => { const r = d.getBoundingClientRect(); return r.top <= mid && r.bottom >= mid; }));
-    // underline the section you're reading
-    let active = null;
-    for (const [a, sec] of navTargets) if (sec.getBoundingClientRect().top <= innerHeight * 0.35) active = a;
-    const prev = navLinks.find((a) => a.classList.contains("is-active")) || null;
-    if (active !== prev) {
-      for (const a of navLinks) a.classList.toggle("is-active", a === active);
-      glide(line, active, 13);
-    }
-  }
-  // Fonts and resizes change link widths; keep the indicators lined up.
-  const realign = () => { if (line?.dataset.on) glide(line, navLinks.find((a) => a.classList.contains("is-active")), 13); if (hovered) glide(pill, hovered); };
-  addEventListener("resize", realign);
-  document.fonts?.ready.then(realign);
 
-  // ---------- Statement: split into words ----------
+  // ---------- Top bar: hairline once you scroll, amber underline under the section you're in ----------
+  const bar = $("#bar");
+  const barLine = $(".bar-line");
+  const barLinks = $$(".bar-links a").map((a) => [a, a.hash && $(a.hash)]).filter(([, sec]) => sec);
+  let activeLink = null;
+  function updateBar() {
+    bar?.classList.toggle("stuck", scrollY > 8);
+    let next = null;
+    const line = innerHeight * 0.4;
+    for (const [a, sec] of barLinks) { const r = sec.getBoundingClientRect(); if (r.top <= line && r.bottom > line) next = a; }
+    if (next === activeLink) return;
+    activeLink?.classList.remove("is-active");
+    const prev = activeLink;
+    activeLink = next;
+    next?.classList.add("is-active");
+    if (!barLine) return;
+    // Glide between links; when there's no section to mark, shrink into the middle of the last one.
+    const place = (a, show) => {
+      const x = a.offsetLeft, w = a.offsetWidth;
+      return show ? `translateX(${x}px) scaleX(${w})` : `translateX(${x + w / 2}px) scaleX(0)`;
+    };
+    if (!next) { if (prev) barLine.style.transform = place(prev, false); return; }
+    if (!prev) {
+      // grow out from the middle of the link
+      barLine.classList.add("instant");
+      barLine.style.transform = place(next, false);
+      barLine.offsetWidth;
+      barLine.classList.remove("instant");
+    }
+    barLine.style.transform = place(next, true);
+  }
+
+  // ---------- Statement: words light up as you read down ----------
   const statement = $("#statement");
   let words = [];
-  if (statement) {
-    statement.innerHTML = statement.textContent.trim().split(/\s+/).map((w) => `<span class="sw">${esc(w)}</span>`).join(" ");
+  if (statement && !reduced) {
+    const text = statement.textContent.trim();
+    statement.innerHTML = `<span class="sr">${esc(text)}</span><span aria-hidden="true">${text.split(/\s+/).map((w) => `<span class="sw">${esc(w)}</span>`).join(" ")}</span>`;
     words = $$(".sw", statement);
   }
 
-  // ---------- Elements driven by scroll ----------
-  const heroStage = $("#heroStage");
-  const heroWindow = $("#heroWindow");
+  // ---------- How it works: the page on the right follows the step you're reading ----------
   const howStage = $("#howStage");
   const steps = $$(".step");
-  const pdfImg = $("#pdfShot img");
-
+  const howTrack = $(".how-track");
   function placeHowOverlays() {
     if (!howStage) return;
-    const doc = $(".doc", howStage);
+    const doc = $(".stage-doc", howStage);
     const d = doc.getBoundingClientRect();
     const h1 = $(".heap1", howStage).getBoundingClientRect();
     const h2 = $(".heap2", howStage).getBoundingClientRect();
@@ -83,105 +71,142 @@
     const save = $(".save-card", howStage);
     const tip = $(".tip-card", howStage);
     const within = (x, w) => clamp(x, 12, d.width - w - 12);
-    pill.style.left = `${within(h1.right - d.left - pill.offsetWidth + 20, pill.offsetWidth)}px`;
-    pill.style.top = `${h1.top - d.top - pill.offsetHeight - 10}px`;
+    pill.style.left = `${within(h1.right - d.left - pill.offsetWidth + 24, pill.offsetWidth)}px`;
+    pill.style.top = `${h1.top - d.top - pill.offsetHeight - 8}px`;
     save.style.left = `${within(h1.left - d.left - 20, save.offsetWidth)}px`;
     save.style.top = `${h1.bottom - d.top + 10}px`;
     tip.style.left = `${within(h2.left - d.left - 24, tip.offsetWidth)}px`;
     tip.style.top = `${h2.bottom - d.top + 10}px`;
   }
 
+  const demoFrame = $(".demo .frame");
   let ticking = false;
-  function onScroll() {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(update);
-  }
-
   function update() {
     ticking = false;
     const vh = innerHeight;
-    updateNav();
-
-    if (!reduced && heroStage && heroWindow) {
-      const r = heroStage.getBoundingClientRect();
-      const t = clamp((vh - r.top) / (vh * 0.95));
-      const e = 1 - Math.pow(1 - t, 3);
-      heroWindow.style.setProperty("--hr", `${18 * (1 - e)}deg`);
-      heroWindow.style.setProperty("--hs", `${0.9 + 0.1 * e}`);
-      heroWindow.style.setProperty("--hy", `${-40 * e}px`);
-    }
+    updateBar();
 
     if (words.length) {
       const r = statement.getBoundingClientRect();
-      const p = clamp((vh * 0.82 - r.top) / (r.height + vh * 0.32));
-      const lit = p * words.length * 1.08;
-      words.forEach((w, i) => w.style.setProperty("--o", reduced ? 1 : String(clamp(lit - i, 0.14, 1))));
+      const p = clamp((vh * 0.85 - r.top) / (r.height + vh * 0.25));
+      const lit = p * words.length * 1.15;
+      words.forEach((w, i) => w.style.setProperty("--o", String(clamp(lit - i, 0.2, 1))));
     }
 
     if (steps.length && howStage) {
-      let active = 1;
-      let best = Infinity;
-      const mid = innerWidth <= 900 ? vh * 0.72 : vh * 0.5;
-      steps.forEach((s) => {
-        const r = s.getBoundingClientRect();
-        const dist = Math.abs(r.top + Math.min(r.height, vh * 0.4) / 2 - mid);
-        if (dist < best) { best = dist; active = +s.dataset.step; }
+      let active = 1, best = Infinity;
+      const mid = innerWidth <= 960 ? vh * 0.72 : vh * 0.5;
+      const centers = steps.map((s) => { const r = s.getBoundingClientRect(); return r.top + Math.min(r.height, vh * 0.4) / 2; });
+      centers.forEach((c, i) => {
+        const dist = Math.abs(c - mid);
+        if (dist < best) { best = dist; active = i + 1; }
+        // fade smoothly with distance from the reading line instead of snapping
+        const t = clamp(dist / (vh * 0.42));
+        steps[i].style.setProperty("--so", (1 - 0.58 * t * t * (3 - 2 * t)).toFixed(3));
       });
       if (howStage.dataset.active !== String(active)) howStage.dataset.active = String(active);
-      steps.forEach((s) => s.classList.toggle("active", +s.dataset.step === active));
+      if (howTrack) howTrack.style.setProperty("--hp", clamp((mid - centers[0]) / (centers[centers.length - 1] - centers[0])).toFixed(4));
     }
 
-    if (!reduced && pdfImg) {
-      const r = pdfImg.getBoundingClientRect();
-      const t = clamp((vh - r.top) / (vh * 0.85));
-      const e = 1 - Math.pow(1 - t, 3);
-      pdfImg.style.setProperty("--ps", `${0.88 + 0.12 * e}`);
-      pdfImg.style.setProperty("--po", `${0.35 + 0.65 * e}`);
+    if (reduced) return;
+    if (demoFrame) {
+      // the demo starts tipped back and settles flat as you scroll to it
+      const r = demoFrame.getBoundingClientRect();
+      const e = 1 - Math.pow(1 - clamp((vh - r.top) / (vh * 0.75)), 3);
+      demoFrame.style.setProperty("--hr", `${(14 * (1 - e)).toFixed(2)}deg`);
+      demoFrame.style.setProperty("--hs", (0.94 + 0.06 * e).toFixed(4));
     }
   }
-
+  const onScroll = () => { if (!ticking) { ticking = true; requestAnimationFrame(update); } };
   addEventListener("scroll", onScroll, { passive: true });
-  addEventListener("resize", () => { placeHowOverlays(); onScroll(); });
-  document.fonts?.ready.then(() => { placeHowOverlays(); update(); });
+  addEventListener("resize", () => { placeHowOverlays(); activeLink = null; onScroll(); });
+  document.fonts?.ready.then(() => { placeHowOverlays(); activeLink = null; update(); });
   placeHowOverlays();
   update();
 
-  // ---------- Reveal on enter ----------
-  const groups = new Map();
-  $$(".reveal").forEach((el) => {
-    const list = groups.get(el.parentElement) || [];
-    el.style.setProperty("--rd", `${Math.min(list.length, 5) * 70}ms`);
-    list.push(el);
-    groups.set(el.parentElement, list);
-  });
-  const io = new IntersectionObserver(
-    (entries) => entries.forEach((e) => {
-      if (!e.isIntersecting) return;
-      e.target.classList.add("in");
-      io.unobserve(e.target);
-      $$(".count", e.target).forEach(countUp);
-      if (e.target.id === "flip" && !reduced) setTimeout(() => e.target.classList.add("flipped"), 1400);
-    }),
-    { threshold: 0.12, rootMargin: "0px 0px -4% 0px" },
-  );
-  $$(".reveal").forEach((el) => io.observe(el));
-
-  function countUp(el) {
+  // ---------- Counts up once when it comes into view ----------
+  const seen = (el, fn, threshold = 0.6) => {
+    if (!el) return;
+    if (!("IntersectionObserver" in window)) return fn();
+    const io = new IntersectionObserver((en) => { if (en[0].isIntersecting) { io.disconnect(); fn(); } }, { threshold });
+    io.observe(el);
+  };
+  $$(".count").forEach((el) => {
+    if (reduced) return;
     const to = +el.dataset.to;
-    if (reduced) { el.textContent = to.toLocaleString(); return; }
-    const start = performance.now();
-    const dur = 1600;
-    const step = (now) => {
-      const t = clamp((now - start) / dur);
-      el.textContent = Math.round(to * (1 - Math.pow(1 - t, 4))).toLocaleString();
-      if (t < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }
+    el.textContent = "0";
+    seen(el, () => {
+      const t0 = performance.now();
+      const step = (now) => {
+        const t = clamp((now - t0) / 1500);
+        el.textContent = Math.round(to * (1 - Math.pow(1 - t, 4))).toLocaleString("en-US");
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    }, 1);
+  });
 
-  // ---------- Flip card ----------
-  $("#flip")?.addEventListener("click", (e) => e.currentTarget.classList.toggle("flipped"));
+  // ---------- Quiz: a real little round. Missed terms come back; finish to see your score ----------
+  const flip = $("#flip");
+  if (flip) {
+    const DECK = [
+      ["PSYCH 202", "Discomfort from a conflict between what you do and what you believe.", "cognitive dissonance"],
+      ["CS 400", "A complete tree where every node's key is at least as extreme as its parent's.", "heap"],
+      ["STAT 240", "The chance of a result at least this extreme if the null hypothesis were true.", "p-value"],
+      ["BIO 152", "Water moving across a membrane toward the side with more dissolved particles.", "osmosis"],
+      ["ECON 101", "How strongly demand or supply reacts when the price changes.", "elasticity"],
+    ];
+    const front = $(".front", flip), back = $(".back", flip);
+    const meta = $("#qMeta"), prompt = $("#qPrompt"), hint = $("#qHint");
+    const course = $("#qCourse"), answer = $("#qAnswer"), score = $("#qScore");
+    const grades = $$("[data-grade]", flip);
+    let queue, firstTry, missed, cleared, card, done;
+
+    const turn = (on) => {
+      flip.classList.toggle("flipped", on);
+      front.setAttribute("aria-hidden", String(on));
+      back.setAttribute("aria-hidden", String(!on));
+      front.tabIndex = on ? -1 : 0;
+      grades.forEach((g) => (g.tabIndex = on ? 0 : -1));
+    };
+    const showFront = () => {
+      if (done) {
+        meta.textContent = "Round done";
+        prompt.innerHTML = `<span class="done">${firstTry} of ${DECK.length} on the first try</span>`;
+        hint.textContent = "Tap to go again";
+        score.innerHTML = missed.size ? `You missed <b>${[...missed].join(", ")}</b>. In Margin those come back first next time.` : "A clean round. Margin would space these out now.";
+        return;
+      }
+      card = queue[0];
+      meta.textContent = missed.has(card[2]) ? `${card[0]} · back again` : `${card[0]} · ${DECK.indexOf(card) + 1} of ${DECK.length}`;
+      prompt.textContent = card[1];
+      hint.textContent = "Tap to see the term";
+      course.textContent = card[0];
+      answer.textContent = card[2];
+    };
+    const reset = () => { queue = DECK.slice(); firstTry = 0; missed = new Set(); cleared = 0; done = false; score.textContent = ""; showFront(); };
+    reset();
+
+    front.addEventListener("click", () => {
+      if (done) { turn(false); reset(); return; }
+      turn(true);
+      grades[1].focus({ preventScroll: true });
+    });
+    grades.forEach((g) => g.addEventListener("click", () => {
+      const got = g.dataset.grade === "got";
+      queue.shift();
+      if (!missed.has(card[2]) && got) firstTry++;
+      if (!got) { missed.add(card[2]); queue.splice(Math.min(1, queue.length), 0, card); }
+      if (got) cleared++;
+      done = queue.length === 0;
+      // swap the front while it's facing away, then turn back to it
+      showFront();
+      turn(false);
+      front.focus({ preventScroll: true });
+      const left = queue.length;
+      if (!done) score.innerHTML = `<b>${firstTry}</b> right on the first try · ${left} to go`;
+    }));
+  }
 
   // ---------- Toast ----------
   const toast = document.createElement("div");
@@ -199,7 +224,7 @@
   // ---------- Live demo ----------
   const COURSES = {
     cs: {
-      name: "CS 400", color: "#e0962b", url: "cs400 · lecture notes",
+      name: "CS 400", color: "var(--cs)", url: "cs400 · lecture notes",
       html: `<p class="doc-kicker">CS 400 · Week 9</p><h3 class="doc-title">Priority queues</h3>
 <p>A [[priority queue]] always hands back the most important item next. The usual way to build one is with a [[heap]], which keeps the smallest key at the root.</p>
 <p>Because a [[heap]] is a [[complete binary tree]], it fits in an array with no pointers. Fast lookups by key still belong to the [[hash table]], which trades order for speed.</p>`,
@@ -220,7 +245,7 @@
       },
     },
     stat: {
-      name: "STAT 240", color: "#3b82f6", url: "stat240 · lecture 18",
+      name: "STAT 240", color: "var(--stat)", url: "stat240 · lecture 18",
       html: `<p class="doc-kicker">STAT 240 · Lecture 18</p><h3 class="doc-title">Inference, in one page</h3>
 <p>Before trusting a result, check the [[p-value]]: small values are evidence against the null hypothesis. A [[confidence interval]] gives a range of plausible values instead of a single guess.</p>
 <p>How wide that range is depends on the [[sampling distribution]] of your statistic. Report the [[p-value]] alongside the interval, never instead of it.</p>`,
@@ -239,7 +264,7 @@
       },
     },
     psych: {
-      name: "PSYCH 202", color: "#22a06b", url: "psych202 · chapter 12",
+      name: "PSYCH 202", color: "var(--psych)", url: "psych202 · chapter 12",
       html: `<p class="doc-kicker">PSYCH 202 · Chapter 12</p><h3 class="doc-title">Why we believe what we believe</h3>
 <p>In [[operant conditioning]], behavior is shaped by its consequences. People also work hard to avoid [[cognitive dissonance]], the discomfort of acting against their own beliefs.</p>
 <p>When you read a study, watch for a [[confounding variable]], and for your own [[confirmation bias]].</p>`,
@@ -326,7 +351,7 @@
       $$(".cand.open", doc).forEach((b) => b.classList.remove("open"));
     }
 
-    function openSave(btn) {
+    function openSave(btn, byUser = true) {
       const c = COURSES[course];
       const term = btn.dataset.term;
       const options = c.find[term] || [];
@@ -341,12 +366,13 @@
           <div class="field term-field">${esc(term)}</div>
           <div class="def-row"><span>Definition</span><span class="seg" role="group"><b role="button" tabindex="0" data-mode="own" class="${mode === "own" ? "on" : ""}">Write my own</b><b role="button" tabindex="0" data-mode="find" class="${mode === "find" ? "on" : ""}">Find one</b></span></div>
           ${mode === "find"
-            ? options.map(([src, detail, text], i) => `<div class="sugg${i === picked ? " on" : ""}" role="button" tabindex="0" data-i="${i}"><span class="src"><b>${esc(src)}</b> · ${esc(detail)}</span>${esc(text)}</div>`).join("")
+            ? options.map(([src, detail, text], i) => `<div class="sugg${i === picked ? " on" : ""}" role="button" tabindex="0" aria-pressed="${i === picked}" data-i="${i}"><span class="src"><b>${esc(src)}</b> · ${esc(detail)}</span>${esc(text)}</div>`).join("")
             : `<textarea placeholder="What does it mean? Your own words stick best." aria-label="Your definition"></textarea>`}
           <div class="save-foot"><span class="course">${c.name}</span><button class="btn-mini" type="button">Save</button></div>`;
         place(save, btn);
         save.classList.add("show");
         if (mode === "own") $("textarea", save).focus();
+        else if (byUser) ($(".sugg.on", save) || save).focus({ preventScroll: true });
       };
       draw();
 
@@ -355,7 +381,7 @@
         const s = e.target.closest(".sugg");
         if (e.target.closest(".x")) return closeSave();
         if (m && m.dataset.mode !== mode) { mode = m.dataset.mode; draw(); return; }
-        if (s) { picked = +s.dataset.i; $$(".sugg", save).forEach((el, i) => el.classList.toggle("on", i === picked)); return; }
+        if (s) { picked = +s.dataset.i; $$(".sugg", save).forEach((el, i) => { el.classList.toggle("on", i === picked); el.setAttribute("aria-pressed", String(i === picked)); }); return; }
         if (e.target.closest(".btn-mini")) {
           let def;
           let src;
@@ -386,7 +412,7 @@
     doc.addEventListener("click", (e) => {
       const b = e.target.closest("button");
       if (!b) return;
-      if (b.classList.contains("cand")) openSave(b);
+      if (b.classList.contains("cand")) openSave(b, e.isTrusted);
       else if (b.classList.contains("saved")) tip.classList.contains("show") ? tip.classList.remove("show") : showTip(b);
     });
     document.addEventListener("pointerdown", (e) => {
@@ -394,18 +420,86 @@
       if (!e.target.closest(".saved")) tip.classList.remove("show");
     });
 
+    // Escape closes the save card wherever focus is
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape" && save.classList.contains("show")) closeSave(); });
+    // cards are placed against the text, so close them when the layout changes
+    addEventListener("resize", () => { closeSave(); tip.classList.remove("show"); });
+
+    let pending = course, switchTimer;
     $$(".demo-tabs button").forEach((tab) =>
       tab.addEventListener("click", () => {
-        if (tab.dataset.course === course) return;
-        $$(".demo-tabs button").forEach((t) => t.setAttribute("aria-selected", String(t === tab)));
+        if (tab.dataset.course === pending) return;
+        pending = tab.dataset.course;
+        $$(".demo-tabs button").forEach((t) => t.setAttribute("aria-pressed", String(t === tab)));
         closeSave();
         tip.classList.remove("show");
         doc.classList.add("fading");
-        setTimeout(() => { course = tab.dataset.course; render(); doc.classList.remove("fading"); }, 220);
+        clearTimeout(switchTimer);
+        switchTimer = setTimeout(() => { course = pending; render(); doc.classList.remove("fading"); }, 220);
       }),
     );
 
     render();
+
+    // ---------- Autoplay: the first time the demo is on screen, it shows itself being used ----------
+    if (!reduced) {
+      const cursor = document.createElement("div");
+      cursor.className = "cursor";
+      cursor.setAttribute("aria-hidden", "true");
+      cursor.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 2.5v13.2l3.4-3.1 2.3 5.1 2.3-1-2.3-5h4.7z" fill="#1d1c1a" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg>';
+      win.append(cursor);
+      let stopped = false;
+      const stop = () => {
+        if (stopped) return;
+        stopped = true;
+        cursor.classList.remove("on");
+        if (driving) { closeSave(); tip.classList.remove("show"); }
+      };
+      let driving = false;
+      if ("IntersectionObserver" in window) {
+        const away = new IntersectionObserver((en) => { if (driving && !en[0].isIntersecting) stop(); }, { threshold: 0.2 });
+        away.observe(demo);
+      }
+      ["pointerdown", "keydown", "wheel"].forEach((t) => demo.addEventListener(t, (e) => { if (e.isTrusted) stop(); }, { passive: true }));
+      demo.addEventListener("pointermove", (e) => { if (e.isTrusted && e.pointerType === "mouse") stop(); });
+      const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+      const at = (el, dx = 0.5, dy = 0.7) => {
+        const w = win.getBoundingClientRect(), r = el.getBoundingClientRect();
+        cursor.style.transform = `translate(${r.left - w.left + r.width * dx - 4}px, ${r.top - w.top + r.height * dy - 2}px)`;
+      };
+      const press = async () => { cursor.classList.add("press"); await wait(140); cursor.classList.remove("press"); };
+      async function play() {
+        if (course !== "cs" || stopped) return;
+        const w = win.getBoundingClientRect();
+        cursor.style.transition = "none";
+        cursor.style.transform = `translate(${w.width * 0.82}px, ${w.height * 0.9}px)`;
+        cursor.offsetWidth;
+        cursor.style.transition = "";
+        cursor.classList.add("on");
+        driving = true;
+        await wait(300);
+        const savedBtn = $(".saved", doc);
+        if (stopped) return; at(savedBtn); await wait(800);
+        if (stopped) return; showTip(savedBtn); await wait(1900);
+        if (stopped) return; tip.classList.remove("show");
+        const heap = $('.cand[data-term="heap"]', doc);
+        if (!heap) return stop();
+        at(heap); await wait(850);
+        if (stopped) return; await press(); if (stopped) return; openSave(heap, false); await wait(1300);
+        const pick = $(".sugg", save);
+        if (stopped || !pick) return; at(pick, 0.6, 0.5); await wait(900);
+        if (stopped) return; await press(); await wait(500);
+        const go = $(".btn-mini", save);
+        if (stopped || !go) return; at(go, 0.5, 0.5); await wait(850);
+        if (stopped) return; await press(); if (stopped) return; go.click(); await wait(1100);
+        const now = $('.saved[data-term="heap"]', doc);
+        if (stopped || !now) return stop();
+        at(now); await wait(800);
+        if (stopped) return; showTip(now); await wait(2200);
+        if (stopped) return; tip.classList.remove("show"); driving = false; stop();
+      }
+      seen(demo, () => setTimeout(play, 700), 0.55);
+    }
   }
 })();
 
@@ -419,7 +513,10 @@ document.addEventListener("click", (e) => {
   if (url.hash && !target) return;
   e.preventDefault();
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  if (target) target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+  if (target) {
+    target.scrollIntoView({ behavior: reduce ? "auto" : "smooth", block: "start" });
+    if (target.id === "main") target.focus({ preventScroll: true });
+  }
   else window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
   if (location.hash) history.replaceState(null, "", location.pathname + location.search);
 });
