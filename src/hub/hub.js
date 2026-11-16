@@ -932,10 +932,12 @@ function renderSettings() {
 
   // Shortcut + file access
   const shortcutVal = h("span", { class: "chip" }, SHORTCUT_LABEL);
+  const sidebarVal = h("span", { class: "chip" }, SIDEBAR_LABEL);
   chrome.commands.getAll().then((cmds) => {
-    const c = cmds.find((x) => x.name === "save-term");
-    shortcutVal.textContent = c?.shortcut || "Not set";
+    shortcutVal.textContent = cmds.find((x) => x.name === "save-term")?.shortcut || "Not set";
+    sidebarVal.textContent = cmds.find((x) => x.name === "open-sidebar")?.shortcut || "Not set";
   });
+  const changeShortcut = () => chrome.tabs.create({ url: "chrome://extensions/shortcuts" });
   const fileStatus = h("span", { class: "status" });
   chrome.extension.isAllowedFileSchemeAccess().then((ok) => {
     fileStatus.className = `status ${ok ? "ok" : "warn"}`;
@@ -949,7 +951,12 @@ function renderSettings() {
       settingRow(
         "Save term shortcut",
         "Change it on Chrome's shortcuts page.",
-        h("div", { style: "display:flex;gap:8px;align-items:center" }, shortcutVal, h("button", { class: "btn", onclick: () => chrome.tabs.create({ url: "chrome://extensions/shortcuts" }) }, "Change")),
+        h("div", { style: "display:flex;gap:8px;align-items:center" }, shortcutVal, h("button", { class: "btn", onclick: changeShortcut }, "Change")),
+      ),
+      settingRow(
+        "Class sidebar shortcut",
+        "Opens the sidebar with your terms for one class.",
+        h("div", { style: "display:flex;gap:8px;align-items:center" }, sidebarVal, h("button", { class: "btn", onclick: changeShortcut }, "Change")),
       ),
       settingRow(
         "Local PDF files",

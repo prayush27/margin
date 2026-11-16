@@ -6,7 +6,7 @@
 
 **Every term, in the margin.**<br>
 A free Chrome extension that builds your course glossary while you study.<br>
-Save a term once and see its definition on every page and lecture PDF.
+Save a term once and see its definition on Canvas, course sites and lecture PDFs.
 
 [![CI](https://github.com/prayush27/margin/actions/workflows/ci.yml/badge.svg)](https://github.com/prayush27/margin/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-f2a93b)](LICENSE)
@@ -108,12 +108,13 @@ Margin is coming soon to the **Chrome Web Store**, which will be the only offici
 | Shortcut | Action |
 | --- | --- |
 | <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd> (<kbd>Alt</kbd><kbd>Shift</kbd><kbd>S</kbd>) | Save the selected text as a term |
+| <kbd>⌥</kbd><kbd>⇧</kbd><kbd>M</kbd> (<kbd>Alt</kbd><kbd>Shift</kbd><kbd>M</kbd>) | Open the class sidebar |
 | <kbd>⌘</kbd><kbd>↵</kbd> | Save from the save card |
 | <kbd>Esc</kbd> | Close the card |
 | <kbd>/</kbd> | Search the glossary |
 | <kbd>Space</kbd>, then <kbd>1</kbd> / <kbd>2</kbd> | Quiz: reveal, then *missed it* / *got it* |
 
-Change the save shortcut at `chrome://extensions/shortcuts`.
+Change either shortcut at `chrome://extensions/shortcuts`.
 
 ## Privacy
 
@@ -164,7 +165,7 @@ No Node? On macOS, `jsc -m tests/run.mjs` runs the tests with the built-in JavaS
 
 ## Roadmap
 
-- [x] Hover definitions on any page, PDF viewer, glossary, quiz
+- [x] Hover definitions on course sites and PDFs, PDF viewer, glossary, quiz
 - [x] **Find one**: subject-aware definitions from textbooks, field references and encyclopedias
 - [x] **Suggested terms** in lecture PDFs: glossary matches, slide definitions and word-rarity scoring
 - [x] **Class sidebar**: one class's terms beside any page, with the ones on the page first

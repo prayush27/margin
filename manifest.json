@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Margin",
-  "version": "0.1.0",
-  "description": "Your course glossary, everywhere you study. Save a term once and see its definition on every page and lecture PDF.",
+  "version": "0.1.1",
+  "description": "Your course glossary, everywhere you study. Save a term once and see its definition on Canvas, course sites and lecture PDFs.",
   "minimum_chrome_version": "120",
   "icons": {
     "16": "icons/icon-16.png",
