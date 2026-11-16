@@ -18,7 +18,7 @@ Save a term once and see its definition on Canvas, course sites and lecture PDFs
 
 <br>
 
-<a href="https://margin.prayushdesai.com/#film"><img src=".github/media/film.jpg" width="860" alt="Watch Margin in a minute: a 58-second film with sound and captions, showing a saved term’s definition on hover in a biology textbook"></a>
+<a href="https://margin.prayushdesai.com/#film"><img src=".github/media/film.jpg" width="860" alt="Watch Margin in a minute: a 58-second film with sound and captions, underlining saved terms on Canvas, in textbooks and in lecture slides"></a>
 
 <sub>▶ <a href="https://margin.prayushdesai.com/#film">Watch the 58-second film</a> with sound and captions on the website.</sub>
 

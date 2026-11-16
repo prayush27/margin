@@ -248,12 +248,46 @@
   }
 
   // ---------- Live demo ----------
+  // Each class opens on a different kind of page, drawn the way it really looks: a Canvas course page,
+  // a lecture PDF, an online textbook. Only the text and its terms are interactive; the chrome is decoration.
+  const ic = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+  const CANVAS_RAIL = `<nav class="cv-rail" aria-hidden="true">
+      <span class="cv-r"><i class="cv-avatar"></i>Account</span>
+      <span class="cv-r">${ic('<path d="M4 13a8 8 0 1 1 16 0"/><path d="m12 13 4-4"/>')}Dashboard</span>
+      <span class="cv-r on">${ic('<path d="M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3z"/><path d="M5 16.5a3 3 0 0 1 3-3h11"/>')}Courses</span>
+      <span class="cv-r">${ic('<rect x="4" y="5.5" width="16" height="14" rx="1.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/>')}Calendar</span>
+      <span class="cv-r">${ic('<path d="M4 13.5 6.5 6h11l2.5 7.5V19H4z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/>')}Inbox</span>
+    </nav>`;
+  const canvasPage = (crumbs, body) => `<div class="cv">${CANVAS_RAIL}<div class="cv-main">
+      <div class="cv-crumbs" aria-hidden="true">${ic('<path d="M4 7h16M4 12h16M4 17h16"/>')}${crumbs.map((c, i) => i < crumbs.length - 1 ? `<span class="cv-a">${c}</span><span class="cv-sep">›</span>` : `<span>${c}</span>`).join("")}</div>
+      <div class="cv-body">
+        <nav class="cv-course" aria-hidden="true"><span>Home</span><span>Announcements</span><span class="on">Modules</span><span>Assignments</span><span>Discussions</span><span>Grades</span><span>Files</span></nav>
+        <div class="cv-page">${body}
+          <div class="cv-foot" aria-hidden="true"><span class="cv-btn">◀ Previous</span><span class="cv-btn">Next ▶</span></div>
+        </div>
+      </div></div></div>`;
+  const pdfPage = (file, page, total, slide, thumbs) => `<div class="pv">
+      <div class="pv-bar" aria-hidden="true">${ic('<path d="M4 7h16M4 12h16M4 17h16"/>')}<span class="pv-file">${file}</span>
+        <span class="pv-mid"><span class="pv-num">${page}</span>/ ${total}<i></i><b>−</b><span class="pv-zoom">100%</span><b>+</b></span>
+        <span class="pv-tools">${ic('<path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M5 19.5h14"/>')}${ic('<path d="M7 8V4h10v4M6 17H4.5V9.5h15V17H18M7 13.5h10V20H7z"/>')}</span></div>
+      <div class="pv-body">
+        <div class="pv-thumbs" aria-hidden="true">${thumbs.map((n) => `<span class="${n === page ? "on" : ""}"><i></i>${n}</span>`).join("")}</div>
+        <div class="pv-canvas"><div class="slide">${slide}</div></div>
+      </div></div>`;
+  const bookPage = (book, toc, body) => `<div class="tb">
+      <div class="tb-banner" aria-hidden="true">${ic('<path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13"/>')}<span>${book}</span></div>
+      <div class="tb-tools" aria-hidden="true"><span class="tb-btn">${ic('<path d="M4 7h16M4 12h16M4 17h10"/>')}Contents</span><span class="tb-search">${ic('<circle cx="11" cy="11" r="6"/><path d="m20 20-4.5-4.5"/>')}Search this book</span></div>
+      <div class="tb-body">
+        <nav class="tb-toc" aria-hidden="true">${toc.map(([t, on]) => `<span class="${on ? "on" : ""}">${t}</span>`).join("")}</nav>
+        <div class="tb-page">${body}</div>
+      </div></div>`;
+
   const COURSES = {
     cs: {
-      name: "CS 400", color: "var(--cs)", url: "cs400 · lecture notes",
-      html: `<p class="doc-kicker">CS 400 · Week 9</p><h3 class="doc-title">Priority queues</h3>
+      name: "CS 400", color: "var(--cs)", kind: "canvas", url: "canvas.school.edu/courses/400/pages/week-9-heaps", where: "Canvas · Week 9: Heaps",
+      html: canvasPage(["CS 400", "Pages", "Week 9: Heaps"], `<h3 class="cv-title">Week 9: Priority queues and heaps</h3>
 <p>A [[priority queue]] always hands back the most important item next. The usual way to build one is with a [[heap]], which keeps the smallest key at the root.</p>
-<p>Because a [[heap]] is a [[complete binary tree]], it fits in an array with no pointers. Fast lookups by key still belong to the [[hash table]], which trades order for speed.</p>`,
+<p>Because a [[heap]] is a [[complete binary tree]], it fits in an array with no pointers. Fast lookups by key still belong to the [[hash table]], which trades order for speed.</p>`),
       saved: {
         "priority queue": { def: "Represents a collection of elements where each element has an associated priority value.", src: "OpenStax" },
         "complete binary tree": { def: "A binary tree in which every level, except possibly the deepest, is completely filled, with nodes as far left as possible.", src: "NIST" },
@@ -271,10 +305,10 @@
       },
     },
     stat: {
-      name: "STAT 240", color: "var(--stat)", url: "stat240 · lecture 18",
-      html: `<p class="doc-kicker">STAT 240 · Lecture 18</p><h3 class="doc-title">Inference, in one page</h3>
-<p>Before trusting a result, check the [[p-value]]: small values are evidence against the null hypothesis. A [[confidence interval]] gives a range of plausible values instead of a single guess.</p>
-<p>How wide that range is depends on the [[sampling distribution]] of your statistic. Report the [[p-value]] alongside the interval, never instead of it.</p>`,
+      name: "STAT 240", color: "var(--stat)", kind: "pdf", url: "stat240-lecture18.pdf", where: "Lecture 18 slides, p. 7",
+      html: pdfPage("stat240-lecture18.pdf", 7, 31, `<p class="slide-kick">Hypothesis testing</p><h3 class="slide-title">Inference, in one slide</h3>
+<ul class="slide-list"><li>Check the [[p-value]] first: small values are evidence against H<sub>0</sub></li><li>A [[confidence interval]] gives a range of plausible values</li><li>Its width comes from the [[sampling distribution]]</li><li>Report the [[p-value]] <em>with</em> the interval, never instead</li></ul>
+<div class="slide-foot" aria-hidden="true"><span>STAT 240 · Lecture 18</span><span>7</span></div>`, [6, 7, 8]),
       saved: {
         "confidence interval": { def: "An interval where sample data is used to provide an estimate for a population parameter.", src: "OpenStax" },
       },
@@ -290,10 +324,11 @@
       },
     },
     psych: {
-      name: "PSYCH 202", color: "var(--psych)", url: "psych202 · chapter 12",
-      html: `<p class="doc-kicker">PSYCH 202 · Chapter 12</p><h3 class="doc-title">Why we believe what we believe</h3>
-<p>In [[operant conditioning]], behavior is shaped by its consequences. People also work hard to avoid [[cognitive dissonance]], the discomfort of acting against their own beliefs.</p>
-<p>When you read a study, watch for a [[confounding variable]], and for your own [[confirmation bias]].</p>`,
+      name: "PSYCH 202", color: "var(--psych)", kind: "book", url: "openstax.org/books/psychology-2e/pages/12-3-attitudes-and-persuasion", where: "Psychology 2e, 12.3",
+      html: bookPage("Psychology 2e", [["12 Social Psychology"], ["12.1 What Is Social Psychology?"], ["12.2 Self-presentation"], ["12.3 Attitudes and Persuasion", true], ["12.4 Conformity, Compliance, and Obedience"], ["12.5 Prejudice and Discrimination"], ["Key Terms"]], `<h3 class="tb-title"><span>12.3</span> Attitudes and Persuasion</h3>
+<div class="tb-lo" aria-hidden="true"><b>Learning objectives</b>By the end of this section, you will be able to define attitude and describe how attitudes change.</div>
+<p>An <strong>attitude</strong> is our evaluation of a person, an idea, or an object. Attitudes are learned partly through [[operant conditioning]]: behavior that is rewarded is repeated. People also work hard to avoid [[cognitive dissonance]], the discomfort of acting against their own beliefs.</p>
+<p>When you read a study, watch for a [[confounding variable]], and for your own [[confirmation bias]].</p>`),
       saved: {
         "operant conditioning": { def: "Learning process whereby feedback from the environment shapes an individual's behavior.", src: "OpenStax" },
       },
@@ -338,7 +373,8 @@
         const cls = s ? `saved${fresh === term ? " just" : ""}` : "cand";
         return `<button type="button" class="${cls}" data-term="${esc(term)}">${esc(term)}</button>`;
       });
-      url.textContent = c.url;
+      url.innerHTML = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.2a3 3 0 0 1 6 0V7"/><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/></svg><span>${esc(c.url)}</span>`;
+      doc.dataset.kind = c.kind;
       const all = new Set([...c.html.matchAll(/\[\[([^\]]+)\]\]/g)].map((m) => m[1]));
       const n = [...all].filter((t) => c.saved[t]).length;
       status.innerHTML = n === all.size
@@ -366,7 +402,7 @@
       if (!s) return;
       clearTimeout(hideTimer);
       tip.innerHTML = `<div class="card-head"><span class="term">${esc(btn.dataset.term)}</span><span class="chip"><i style="background:${c.color}"></i>${c.name}</span></div>
-        <p class="card-def">${esc(s.def)}</p><div class="card-meta"><span>${esc(c.url)}</span><span>${s.src === "mine" ? "your words" : `via ${esc(s.src)}`}</span></div>`;
+        <p class="card-def">${esc(s.def)}</p><div class="card-meta"><span>${esc(c.where)}</span><span>${s.src === "mine" ? "your words" : `via ${esc(s.src)}`}</span></div>`;
       place(tip, btn);
       tip.classList.add("show");
     }

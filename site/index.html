@@ -68,9 +68,9 @@
             <button type="button" data-course="stat" aria-pressed="false"><i style="background:var(--stat)"></i>STAT 240</button>
             <button type="button" data-course="psych" aria-pressed="false"><i style="background:var(--psych)"></i>PSYCH 202</button>
           </div>
-          <span class="url" id="demoUrl">cs400 · lecture notes</span>
+          <span class="url" id="demoUrl">canvas.school.edu/courses/400/pages/week-9-heaps</span>
         </div>
-        <article class="doc demo-doc" id="demoDoc"></article>
+        <article class="doc demo-doc" id="demoDoc" data-kind="canvas"></article>
       </div>
     </div>
     <div class="demo-cap">
@@ -105,8 +105,18 @@
     <div class="how-stage-wrap">
       <div class="how-stage" id="howStage" data-active="1" aria-hidden="true">
         <div class="frame"><div class="surface">
-          <div class="stage-top"><span class="url">canvas · cs 400 · week 9</span></div>
+          <div class="stage-top"><span class="url"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M5 7V5.2a3 3 0 0 1 6 0V7"/><rect x="3.5" y="7" width="9" height="6.5" rx="1.5"/></svg><span>canvas.school.edu/courses/400/pages/week-9-heaps</span></span></div>
+          <div class="cv cv-stage">
+          <nav class="cv-rail" aria-hidden="true">
+            <span class="cv-r"><i class="cv-avatar"></i>Account</span>
+            <span class="cv-r"><svg viewBox="0 0 24 24"><path d="M4 13a8 8 0 1 1 16 0"/><path d="m12 13 4-4"/></svg>Dashboard</span>
+            <span class="cv-r on"><svg viewBox="0 0 24 24"><path d="M5 4.5h11a3 3 0 0 1 3 3v12H8a3 3 0 0 1-3-3z"/><path d="M5 16.5a3 3 0 0 1 3-3h11"/></svg>Courses</span>
+            <span class="cv-r"><svg viewBox="0 0 24 24"><rect x="4" y="5.5" width="16" height="14" rx="1.5"/><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4"/></svg>Calendar</span>
+            <span class="cv-r"><svg viewBox="0 0 24 24"><path d="M4 13.5 6.5 6h11l2.5 7.5V19H4z"/><path d="M4 13.5h4.5l1 2h5l1-2H20"/></svg>Inbox</span>
+          </nav>
           <article class="doc stage-doc">
+            <div class="cv-crumbs" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg><span class="cv-a">CS 400</span><span class="cv-sep">›</span><span class="cv-a">Pages</span><span class="cv-sep">›</span><span>Week 9: Heaps</span></div>
+            <h3 class="cv-title">Week 9: Priority queues and heaps</h3>
             <p>The usual way to build a priority queue is with a <span class="t heap1">heap</span>. Inserting and removing both take logarithmic time.</p>
             <p>Because a <span class="t heap2">heap</span> is a complete binary tree, it lives happily in an array.</p>
             <span class="pill"><svg viewBox="0 0 16 16"><path d="M8 3.5v9M3.5 8h9"/></svg>Save term<kbd>⌥⇧S</kbd></span>
@@ -124,6 +134,7 @@
               <div class="card-meta"><span>Week 9 notes</span><span>via NIST</span></div>
             </div>
           </article>
+          </div>
         </div></div>
       </div>
     </div>
