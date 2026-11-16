@@ -208,6 +208,32 @@
     }));
   }
 
+  // ---------- The film: plays with sound on click, pauses when you scroll away, offers the demo at the end ----------
+  const filmSec = $("#film"), video = $("#filmVideo"), playBtn = $("#filmPlay"), filmEnd = $("#filmEnd");
+  if (filmSec && video) {
+    const start = () => {
+      filmEnd.hidden = true;
+      filmSec.classList.add("playing");
+      document.dispatchEvent(new Event("margin:film"));
+      video.controls = true;
+      if (video.ended) video.currentTime = 0;
+      const p = video.play();
+      if (p && p.catch) p.catch(() => {});
+      video.focus({ preventScroll: true });
+    };
+    playBtn.addEventListener("click", start);
+    $("#filmAgain")?.addEventListener("click", () => { video.currentTime = 0; start(); });
+    video.addEventListener("ended", () => { video.controls = false; filmEnd.hidden = false; $(".btn", filmEnd)?.focus({ preventScroll: true }); });
+    $$("[data-play]").forEach((a) => a.addEventListener("click", (e) => {
+      e.preventDefault();
+      filmSec.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
+      start();
+    }));
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((en) => { if (!en[0].isIntersecting && !video.paused) video.pause(); }, { threshold: 0.25 }).observe(video);
+    }
+  }
+
   // ---------- Toast ----------
   const toast = document.createElement("div");
   toast.className = "toast";
@@ -461,6 +487,9 @@
         away.observe(demo);
       }
       ["pointerdown", "keydown", "wheel"].forEach((t) => demo.addEventListener(t, (e) => { if (e.isTrusted) stop(); }, { passive: true }));
+      // the film has the floor once it starts
+      document.addEventListener("margin:film", stop);
+      const inView = () => { const r = demo.getBoundingClientRect(); return r.top < innerHeight * 0.75 && r.bottom > innerHeight * 0.25; };
       demo.addEventListener("pointermove", (e) => { if (e.isTrusted && e.pointerType === "mouse") stop(); });
       const wait = (ms) => new Promise((r) => setTimeout(r, ms));
       const at = (el, dx = 0.5, dy = 0.7) => {
@@ -470,6 +499,8 @@
       const press = async () => { cursor.classList.add("press"); await wait(140); cursor.classList.remove("press"); };
       async function play() {
         if (course !== "cs" || stopped) return;
+        // a smooth scroll can fly past the demo; wait until someone is actually looking at it
+        if (!inView()) return seen(demo, () => setTimeout(play, 700), 0.55);
         const w = win.getBoundingClientRect();
         cursor.style.transition = "none";
         cursor.style.transform = `translate(${w.width * 0.82}px, ${w.height * 0.9}px)`;

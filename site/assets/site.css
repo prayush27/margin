@@ -246,6 +246,44 @@ code { font: 0.85em ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---------- The film ---------- */
+.watch { display: inline-flex; align-items: center; gap: 7px; }
+.watch svg { width: 11px; height: 11px; fill: currentColor; }
+.len { margin-left: 2px; color: var(--ink-3); font-weight: 400; font-variant-numeric: tabular-nums; }
+.film { margin-top: clamp(80px, 12vh, 130px); }
+.film .h2 { margin-bottom: 0; }
+.film-fig { margin: 28px 0 0; }
+.film-surface { overflow: hidden; aspect-ratio: 16 / 9; background: var(--paper); }
+.film-surface video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.film-play {
+  position: absolute; inset: 0; display: flex; align-items: flex-end; justify-content: flex-start; padding: clamp(14px, 2.4vw, 26px);
+  border: 0; background: transparent; cursor: pointer; transition: opacity 300ms var(--out);
+}
+.film-pill {
+  display: inline-flex; align-items: center; gap: 10px; height: 46px; padding: 0 18px 0 6px; border-radius: 999px;
+  background: var(--ink); color: var(--paper); font: 500 15px/1 var(--ui); box-shadow: 0 14px 30px -12px oklch(15% 0 0 / 0.45);
+  transition: transform 350ms var(--out);
+}
+.film-pill .len { color: oklch(100% 0 0 / 0.55); }
+.film-icon { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: var(--amber); color: var(--ink); transition: transform 350ms var(--out); }
+.film-icon svg { width: 12px; height: 12px; fill: currentColor; margin-left: 2px; }
+.film-play:hover .film-pill { transform: translateY(-2px); }
+.film-play:hover .film-icon { transform: scale(1.08); }
+.film.playing .film-play { opacity: 0; pointer-events: none; }
+.film-end {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-align: center;
+  background: color-mix(in oklch, var(--paper) 86%, transparent); -webkit-backdrop-filter: blur(18px) saturate(1.1); backdrop-filter: blur(18px) saturate(1.1); animation: film-end 700ms var(--out) both;
+}
+.film-end[hidden] { display: none; }
+@keyframes film-end { from { opacity: 0; } }
+.film-end > * { animation: rise 700ms var(--out) 120ms both; opacity: 0; transform: translateY(8px); }
+.film-end > .cta-row { animation-delay: 220ms; }
+@media (prefers-reduced-motion: reduce) { .film-end, .film-end > * { animation: none; opacity: 1; transform: none; } }
+.film-end-h { margin: 0; font: 500 clamp(26px, 3.4vw, 40px)/1.1 var(--serif); letter-spacing: -0.018em; }
+.film-end .cta-row { justify-content: center; margin-top: 18px; }
+.film-end button.link { border: 0; background: none; padding: 0; cursor: pointer; }
+@media (max-width: 640px) { .film-pill { height: 40px; font-size: 14px; } .film-icon { width: 30px; height: 30px; } .film-end .cta-row { margin-top: 10px; } }
+
 /* ---------- How it works: steps scroll, the page beside them stays put and plays along ---------- */
 .how { display: grid; grid-template-columns: minmax(0, 22rem) minmax(0, 1fr); gap: var(--gap); margin-top: -8vh; }
 .how-steps { position: relative; }

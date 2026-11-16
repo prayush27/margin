@@ -18,7 +18,9 @@ Save a term once and see its definition on Canvas, course sites and lecture PDFs
 
 <br>
 
-<img src=".github/media/demo.gif" width="860" alt="Selecting “heap” in lecture notes, choosing a definition from NIST, and hovering the term to see it">
+<a href="https://margin.prayushdesai.com/#film"><img src=".github/media/film.jpg" width="860" alt="Watch Margin in a minute: a 58-second film with sound and captions, showing a saved term’s definition on hover in a biology textbook"></a>
+
+<sub>▶ <a href="https://margin.prayushdesai.com/#film">Watch the 58-second film</a> with sound and captions on the website.</sub>
 
 </div>
 
@@ -27,6 +29,8 @@ Save a term once and see its definition on Canvas, course sites and lecture PDFs
 Every course has its own vocabulary, and it's scattered across slides, PDFs, Canvas pages and lecture notes. Margin lets you collect it where you read it: highlight a term, pick or write a definition, and from then on it's underlined everywhere it shows up, with your definition one hover away. At the end of the week your glossary is already built, and you can quiz yourself on it.
 
 It's **free with no word limits**, keeps everything **on your computer**, and has **no account, no ads and no tracking**.
+
+<p align="center"><img src=".github/media/demo.gif" width="860" alt="Selecting “heap” in lecture notes, choosing a definition from NIST, and hovering the term to see it"></p>
 
 ## Features
 

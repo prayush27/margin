@@ -51,6 +51,7 @@
     <div class="cta-row">
       <span class="btn" aria-disabled="true">Coming soon to Chrome</span>
       <a class="link" href="#try">Try it on this page<span aria-hidden="true"> ↓</span></a>
+      <a class="link watch" href="#film" data-play><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 2.4v7.2L9.6 6z"/></svg>Watch the film<span class="len">0:58</span></a>
     </div>
     <p class="fine">Free, with no account. Your notes stay on your laptop.</p>
   </div>
@@ -127,6 +128,30 @@
       </div>
     </div>
   </div>
+</section>
+
+<!-- The film -->
+<section class="sheet film" id="film" aria-labelledby="film-h">
+  <h2 id="film-h" class="col-text h2">Margin in a minute</h2>
+  <div class="note"><span class="note-def">Saving a term, the PDF viewer, the class sidebar and the quiz, in 58 seconds. Sound on, captions included.</span></div>
+  <figure class="col-wide film-fig">
+    <div class="frame"><div class="surface film-surface" id="filmBox">
+      <video id="filmVideo" preload="none" playsinline poster="assets/film/poster.webp" width="1920" height="1080" aria-label="Margin, a one-minute film">
+        <source src="assets/film/margin-film.mp4" type="video/mp4">
+        <track kind="captions" srclang="en" label="English" src="assets/film/margin-film.en.vtt">
+      </video>
+      <button class="film-play" id="filmPlay" type="button" aria-label="Play the film, 58 seconds, with sound">
+        <span class="film-pill"><span class="film-icon"><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M3.5 2.4v7.2L9.6 6z"/></svg></span>Play the film<span class="len">0:58</span></span>
+      </button>
+      <div class="film-end" id="filmEnd" hidden>
+        <p class="film-end-h">Now try it yourself.</p>
+        <div class="cta-row">
+          <a class="btn" href="#try">Open the demo</a>
+          <button class="link" type="button" id="filmAgain">Watch again</button>
+        </div>
+      </div>
+    </div></div>
+  </figure>
 </section>
 
 <!-- Sources -->
