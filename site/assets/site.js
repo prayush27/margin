@@ -366,6 +366,77 @@
     save.setAttribute("aria-label", "Save to Margin");
     win.append(tip, save);
 
+    // ---------- "Try it right here": three steps, and a hint pointing at the next word to try ----------
+    const coach = document.createElement("div");
+    coach.className = "coach";
+    coach.setAttribute("aria-hidden", "true");
+    win.append(coach);
+    const touch = matchMedia("(hover: none)").matches;
+    const title = $("#tryTitle");
+    const stepEls = $$("#trySteps li");
+    const done = new Set();
+    let coachReady = false; // after the demo has been seen (and the autoplay, if any, is over)
+    function mark(step) {
+      if (done.has(step)) return;
+      done.add(step);
+      paintSteps();
+      if (done.size === 3 && title) title.textContent = "That’s Margin.";
+    }
+    function paintSteps() {
+      const next = stepEls.find((li) => !done.has(li.dataset.step));
+      stepEls.forEach((li) => {
+        li.classList.toggle("done", done.has(li.dataset.step));
+        li.classList.toggle("now", li === next);
+        li.setAttribute("aria-label", `${li.textContent.trim()}${done.has(li.dataset.step) ? ", done" : ""}`);
+      });
+      updateCoach();
+    }
+    // the last dotted word on the page: below it there's open space for the hint
+    const lastCand = () => $$(".cand", doc).pop() || null;
+    function updateCoach() {
+      $$(".beckon", doc).forEach((el) => el.classList.remove("beckon"));
+      let target = null;
+      let text = "";
+      if (coachReady && !tip.classList.contains("show")) {
+        if (save.classList.contains("show")) {
+          if (!done.has("save")) { target = $(".btn-mini", save); text = "Pick one, then save"; }
+        } else if (!done.has("hover")) {
+          target = $(".saved", doc); text = touch ? "Your turn: tap this word" : "Your turn: hover over this word";
+        } else if (!done.has("open") || !done.has("save")) {
+          target = lastCand(); text = touch ? "Tap to save it" : "Click to save it";
+        }
+      }
+      if (!target) { coach.classList.remove("show"); return; }
+      if (target.closest("#demoDoc")) target.classList.add("beckon");
+      coach.textContent = text;
+      const w = win.getBoundingClientRect();
+      const r = target.getBoundingClientRect();
+      const cw = coach.offsetWidth;
+      const ch = coach.offsetHeight;
+      coach.classList.remove("below", "side");
+      if (target.matches(".btn-mini")) {
+        // beside the Save button, in the card's empty footer, so it never covers the definitions
+        coach.classList.add("side");
+        // on a narrow card the long hint would cover the course label, so it gets shorter
+        const label = $(".save-foot .course", save)?.getBoundingClientRect();
+        let width = cw;
+        if (label && r.left - cw - 12 < label.right + 8) { coach.textContent = "Then save"; width = coach.offsetWidth; }
+        coach.style.left = `${r.left - w.left - width - 12}px`;
+        coach.style.top = `${r.top - w.top + (r.height - ch) / 2}px`;
+      } else {
+        // dotted words get the hint underneath (open space after the last one); highlighted ones above
+        const mid = r.left - w.left + r.width / 2;
+        const left = clamp(mid - cw / 2, 10, w.width - cw - 10);
+        const fitsBelow = r.bottom - w.top + 12 + ch < w.height - 8;
+        const below = target.matches(".cand") ? fitsBelow : r.top - w.top - ch - 12 < 56;
+        coach.classList.toggle("below", below);
+        coach.style.left = `${left}px`;
+        coach.style.top = `${below ? r.bottom - w.top + 12 : r.top - w.top - ch - 12}px`;
+        coach.style.setProperty("--ax", `${clamp(mid - left, 14, cw - 14)}px`);
+      }
+      coach.classList.add("show");
+    }
+
     function render(fresh) {
       const c = COURSES[course];
       doc.innerHTML = c.html.replace(/\[\[([^\]]+)\]\]/g, (_, term) => {
@@ -380,6 +451,7 @@
       status.innerHTML = n === all.size
         ? `<b>All ${all.size} terms saved.</b> Try another course.`
         : `<b>${n} of ${all.size}</b> terms saved in ${c.name}`;
+      requestAnimationFrame(updateCoach);
     }
 
     function place(card, target) {
@@ -396,21 +468,24 @@
       card.style.top = `${top}px`;
     }
 
-    function showTip(btn) {
+    function showTip(btn, byUser = true) {
       const c = COURSES[course];
       const s = c.saved[btn.dataset.term];
       if (!s) return;
       clearTimeout(hideTimer);
+      if (byUser) mark("hover");
       tip.innerHTML = `<div class="card-head"><span class="term">${esc(btn.dataset.term)}</span><span class="chip"><i style="background:${c.color}"></i>${c.name}</span></div>
         <p class="card-def">${esc(s.def)}</p><div class="card-meta"><span>${esc(c.where)}</span><span>${s.src === "mine" ? "your words" : `via ${esc(s.src)}`}</span></div>`;
       place(tip, btn);
       tip.classList.add("show");
+      coach.classList.remove("show");
     }
-    const hideTip = () => { hideTimer = setTimeout(() => tip.classList.remove("show"), 60); };
+    const hideTip = () => { hideTimer = setTimeout(() => { tip.classList.remove("show"); updateCoach(); }, 60); };
 
     function closeSave() {
       save.classList.remove("show");
       $$(".cand.open", doc).forEach((b) => b.classList.remove("open"));
+      updateCoach();
     }
 
     function openSave(btn, byUser = true) {
@@ -422,6 +497,7 @@
       tip.classList.remove("show");
       closeSave();
       btn.classList.add("open");
+      if (byUser) mark("open");
 
       const draw = () => {
         save.innerHTML = `<div class="save-head"><span class="logo"></span>Save to Margin<button class="x" type="button" aria-label="Close">×</button></div>
@@ -435,6 +511,7 @@
         save.classList.add("show");
         if (mode === "own") $("textarea", save).focus();
         else if (byUser) ($(".sugg.on", save) || save).focus({ preventScroll: true });
+        updateCoach();
       };
       draw();
 
@@ -455,6 +532,7 @@
             [src, , def] = options[picked];
           }
           c.saved[term] = { def, src };
+          if (e.isTrusted) { mark("open"); mark("save"); }
           closeSave();
           render(term);
           showToast(`Saved “${term}” to ${c.name}`);
@@ -475,17 +553,17 @@
       const b = e.target.closest("button");
       if (!b) return;
       if (b.classList.contains("cand")) openSave(b, e.isTrusted);
-      else if (b.classList.contains("saved")) tip.classList.contains("show") ? tip.classList.remove("show") : showTip(b);
+      else if (b.classList.contains("saved")) tip.classList.contains("show") ? (tip.classList.remove("show"), updateCoach()) : showTip(b);
     });
     document.addEventListener("pointerdown", (e) => {
-      if (!save.contains(e.target) && !e.target.closest(".cand")) closeSave();
-      if (!e.target.closest(".saved")) tip.classList.remove("show");
+      if (!save.contains(e.target) && !e.target.closest(".cand") && save.classList.contains("show")) closeSave();
+      if (!e.target.closest(".saved") && tip.classList.contains("show")) { tip.classList.remove("show"); updateCoach(); }
     });
 
     // Escape closes the save card wherever focus is
     document.addEventListener("keydown", (e) => { if (e.key === "Escape" && save.classList.contains("show")) closeSave(); });
     // cards are placed against the text, so close them when the layout changes
-    addEventListener("resize", () => { closeSave(); tip.classList.remove("show"); });
+    addEventListener("resize", () => { closeSave(); tip.classList.remove("show"); updateCoach(); });
 
     let pending = course, switchTimer;
     $$(".demo-tabs button").forEach((tab) =>
@@ -495,6 +573,7 @@
         $$(".demo-tabs button").forEach((t) => t.setAttribute("aria-pressed", String(t === tab)));
         closeSave();
         tip.classList.remove("show");
+        coach.classList.remove("show");
         doc.classList.add("fading");
         clearTimeout(switchTimer);
         switchTimer = setTimeout(() => { course = pending; render(); doc.classList.remove("fading"); }, 220);
@@ -503,21 +582,26 @@
 
     render();
 
-    // ---------- Autoplay: the first time the demo is on screen, it shows itself being used ----------
-    if (!reduced) {
+    // ---------- Autoplay: the first time the demo is on screen, it shows how it works, then hands over ----------
+    // It only demonstrates reading a term; saving one is left for you, with the hint pointing the way.
+    const handOver = () => { coachReady = true; paintSteps(); };
+    if (reduced) {
+      seen(demo, handOver, 0.4);
+    } else {
       const cursor = document.createElement("div");
       cursor.className = "cursor";
       cursor.setAttribute("aria-hidden", "true");
       cursor.innerHTML = '<svg viewBox="0 0 20 20"><path d="M4 2.5v13.2l3.4-3.1 2.3 5.1 2.3-1-2.3-5h4.7z" fill="#1d1c1a" stroke="#fff" stroke-width="1.3" stroke-linejoin="round"/></svg>';
       win.append(cursor);
       let stopped = false;
+      let driving = false;
       const stop = () => {
         if (stopped) return;
         stopped = true;
         cursor.classList.remove("on");
-        if (driving) { closeSave(); tip.classList.remove("show"); }
+        if (driving) { driving = false; closeSave(); tip.classList.remove("show"); }
+        handOver();
       };
-      let driving = false;
       if ("IntersectionObserver" in window) {
         const away = new IntersectionObserver((en) => { if (driving && !en[0].isIntersecting) stop(); }, { threshold: 0.2 });
         away.observe(demo);
@@ -532,9 +616,8 @@
         const w = win.getBoundingClientRect(), r = el.getBoundingClientRect();
         cursor.style.transform = `translate(${r.left - w.left + r.width * dx - 4}px, ${r.top - w.top + r.height * dy - 2}px)`;
       };
-      const press = async () => { cursor.classList.add("press"); await wait(140); cursor.classList.remove("press"); };
       async function play() {
-        if (course !== "cs" || stopped) return;
+        if (course !== "cs" || stopped) return stop();
         // a smooth scroll can fly past the demo; wait until someone is actually looking at it
         if (!inView()) return seen(demo, () => setTimeout(play, 700), 0.55);
         const w = win.getBoundingClientRect();
@@ -546,24 +629,16 @@
         driving = true;
         await wait(300);
         const savedBtn = $(".saved", doc);
-        if (stopped) return; at(savedBtn); await wait(800);
-        if (stopped) return; showTip(savedBtn); await wait(1900);
+        if (stopped || !savedBtn) return stop();
+        at(savedBtn); await wait(800);
+        if (stopped) return; showTip(savedBtn, false); await wait(2000);
         if (stopped) return; tip.classList.remove("show");
-        const heap = $('.cand[data-term="heap"]', doc);
-        if (!heap) return stop();
-        at(heap); await wait(850);
-        if (stopped) return; await press(); if (stopped) return; openSave(heap, false); await wait(1300);
-        const pick = $(".sugg", save);
-        if (stopped || !pick) return; at(pick, 0.6, 0.5); await wait(900);
-        if (stopped) return; await press(); await wait(500);
-        const go = $(".btn-mini", save);
-        if (stopped || !go) return; at(go, 0.5, 0.5); await wait(850);
-        if (stopped) return; await press(); if (stopped) return; go.click(); await wait(1100);
-        const now = $('.saved[data-term="heap"]', doc);
-        if (stopped || !now) return stop();
-        at(now); await wait(800);
-        if (stopped) return; showTip(now); await wait(2200);
-        if (stopped) return; tip.classList.remove("show"); driving = false; stop();
+        const cand = lastCand();
+        if (!cand) return stop();
+        at(cand); await wait(900);
+        if (stopped) return;
+        // your turn: the cursor steps aside and the steps take over
+        stop();
       }
       seen(demo, () => setTimeout(play, 700), 0.55);
     }

@@ -42,9 +42,9 @@
 <section class="sheet hero" aria-labelledby="title">
   <h1 id="title" class="col-text"><span class="sr">Every term, in the margin.</span><span aria-hidden="true"><span class="w" style="--d:0">Every</span> <span class="w" style="--d:1">term,</span> <span class="nw"><span class="w" style="--d:2">in</span> <span class="w" style="--d:3">the</span></span> <span class="w" style="--d:4"><span class="hero-term">margin</span>.</span></span></h1>
   <div class="note hero-note">
-    <span class="note-term">margin</span><span class="note-chip"><i></i>ENGL 101</span>
+    <span class="note-term" aria-label="margin">mar<span class="syl" aria-hidden="true">·</span>gin</span> <span class="note-pos">noun</span>
     <span class="note-def">The blank space beside the text on a page, where readers write what they want to remember.</span>
-    <span class="note-src">via Wiktionary</span>
+    <span class="note-src">Saved to ENGL 101 · via Wiktionary</span>
   </div>
   <div class="col-text hero-in">
     <p class="lede">A free Chrome extension for the words your classes keep using. Save a term once, and Margin underlines it on your course pages and lecture PDFs with your definition one hover away.</p>
@@ -60,6 +60,14 @@
 <!-- Live demo -->
 <section class="demo-wrap" id="try" aria-label="Try Margin">
   <div class="demo" id="demo">
+    <div class="try-head">
+      <h2 class="try-title" id="tryTitle">Try it right here</h2>
+      <ol class="try-steps" id="trySteps" aria-label="Three steps to try Margin">
+        <li data-step="hover"><span class="n"><b>1</b><svg class="ck" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.6 6.3 5 8.6l4.4-5"/></svg></span><span><span class="on-hover">Hover over</span><span class="on-touch">Tap</span> a <span class="k-saved">highlighted</span> word</span></li>
+        <li data-step="open"><span class="n"><b>2</b><svg class="ck" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.6 6.3 5 8.6l4.4-5"/></svg></span><span><span class="on-hover">Click</span><span class="on-touch">Tap</span> a <span class="k-cand">dotted</span> word</span></li>
+        <li data-step="save"><span class="n"><b>3</b><svg class="ck" viewBox="0 0 12 12" aria-hidden="true"><path d="M2.6 6.3 5 8.6l4.4-5"/></svg></span><span>Save it</span></li>
+      </ol>
+    </div>
     <div class="frame">
       <div class="surface demo-window">
         <div class="demo-top">
@@ -74,7 +82,6 @@
       </div>
     </div>
     <div class="demo-cap">
-      <p>Hover a <span class="k-saved">highlighted term</span> to read it. Click a <span class="k-cand">dotted one</span> to save it.</p>
       <p class="demo-status" id="demoStatus" aria-live="polite">2 of 4 terms saved</p>
     </div>
   </div>

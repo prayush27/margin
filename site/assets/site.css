@@ -124,9 +124,10 @@ code { font: 0.85em ui-monospace, "SF Mono", Menlo, monospace; background: var(-
 }
 .note a { color: var(--ink); }
 .note-term { font: 600 18px/1.2 var(--serif); color: var(--ink); }
-.note-chip, .chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 999px; background: var(--wash); font: 600 11px/1 var(--ui); color: var(--ink-2); white-space: nowrap; }
-.note-chip { margin-left: 8px; vertical-align: 2px; }
-.note-chip i, .chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--cs); }
+.note-pos { font: italic 400 15px/1 var(--serif); color: var(--ink-3); }
+.note-term .syl { margin: 0 0.06em; color: var(--ink-3); font-weight: 400; }
+.chip { display: inline-flex; align-items: center; gap: 5px; height: 20px; padding: 0 7px; border-radius: 999px; background: var(--wash); font: 600 11px/1 var(--ui); color: var(--ink-2); white-space: nowrap; }
+.chip i { width: 6px; height: 6px; border-radius: 50%; background: var(--cs); }
 .note-def { display: block; margin-top: 6px; }
 .note-src { display: block; margin-top: 6px; color: var(--ink-3); font-size: 12.5px; }
 .note-num { display: block; font: 500 34px/1 var(--serif); color: var(--ink); letter-spacing: -0.02em; margin-bottom: 6px; font-variant-numeric: lining-nums; }
@@ -311,7 +312,47 @@ code { font: 0.85em ui-monospace, "SF Mono", Menlo, monospace; background: var(-
   .cv-stage .cv-title { display: none; }
 }
 
-.demo-cap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 20px; margin-top: 14px; padding: 0 4px; font: 400 14px/1.5 var(--ui); color: var(--ink-2); }
+/* "Try it right here": three steps above the demo that check off as you do them */
+.try-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px 32px; margin: 0 4px 20px; }
+.try-title { margin: 0; font: 500 clamp(26px, 2.8vw, 32px)/1.1 var(--serif); letter-spacing: -0.018em; color: var(--ink); }
+.try-steps { display: flex; flex-wrap: wrap; gap: 10px 24px; margin: 0; padding: 0; list-style: none; font: 400 15px/1.4 var(--ui); color: var(--ink-3); counter-reset: none; }
+.try-steps li { display: inline-flex; align-items: center; gap: 9px; transition: color 300ms var(--ease); }
+.try-steps .n {
+  position: relative; display: grid; place-items: center; flex: none; width: 22px; height: 22px; border-radius: 50%;
+  border: 1px solid var(--line-2); font: 600 11.5px/1 var(--ui); color: var(--ink-3);
+  transition: background-color 300ms var(--ease), border-color 300ms var(--ease), color 300ms var(--ease), transform 400ms var(--spring);
+}
+.try-steps .n b { font-weight: inherit; transition: opacity 200ms; }
+.try-steps .ck { position: absolute; width: 12px; height: 12px; fill: none; stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 12; stroke-dashoffset: 12; transition: stroke-dashoffset 380ms var(--ease) 120ms; }
+.try-steps li.now { color: var(--ink); }
+.try-steps li.now .n { border-color: var(--ink); background: var(--ink); color: var(--paper); }
+.try-steps li.done .n { border-color: transparent; background: var(--amber); transform: scale(1.08); }
+.try-steps li.done .n b { opacity: 0; }
+.try-steps li.done .ck { stroke-dashoffset: 0; }
+.try-steps .k-saved, .try-steps .k-cand { text-underline-offset: 3px; }
+@media (max-width: 640px) { .try-head { margin-bottom: 16px; } .try-steps { flex-direction: column; gap: 9px; } }
+.on-touch { display: none; }
+@media (hover: none) { .on-hover { display: none; } .on-touch { display: inline; } }
+
+/* the "your turn" hint that points at the word to try next */
+.coach {
+  position: absolute; z-index: 5; left: 0; top: 0; padding: 8px 12px; border-radius: 10px;
+  background: var(--ink); color: var(--paper); font: 500 13.5px/1 var(--ui); white-space: nowrap; pointer-events: none;
+  box-shadow: 0 8px 20px -6px oklch(20% 0.02 70 / 0.45);
+  opacity: 0; transform: translateY(6px); transition: opacity 260ms var(--ease), transform 360ms var(--ease);
+}
+.coach::after { content: ""; position: absolute; left: var(--ax, 50%); bottom: -4px; width: 9px; height: 9px; margin-left: -4.5px; background: inherit; border-radius: 0 0 2px 0; transform: rotate(45deg); }
+.coach.below::after { top: -4px; bottom: auto; border-radius: 2px 0 0 0; }
+.coach.side::after { left: auto; right: -4px; top: 50%; bottom: auto; margin: -4.5px 0 0; border-radius: 0 2px 0 0; }
+.coach.show { opacity: 1; transform: none; animation: coach-bob 2.2s ease-in-out 600ms infinite; }
+@keyframes coach-bob { 50% { translate: 0 -3px; } }
+.demo-doc .beckon { animation: beckon 2.2s ease-in-out 600ms infinite; }
+@keyframes beckon { 50% { background-color: oklch(80% 0.13 75 / 0.5); } }
+.demo-doc .cand.beckon { animation-name: beckon-cand; }
+@keyframes beckon-cand { 50% { background-color: oklch(22% 0.03 70 / 0.08); } }
+@media (prefers-reduced-motion: reduce) { .coach.show, .demo-doc .beckon { animation: none; } }
+
+.demo-cap { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 6px 20px; margin-top: 14px; padding: 0 4px; font: 400 14px/1.5 var(--ui); color: var(--ink-2); }
 .demo-cap p { margin: 0; }
 .k-saved { background: var(--mark); border-radius: 3px; padding: 0 2px; color: var(--ink); text-decoration: underline dotted var(--amber); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 .k-cand { color: var(--ink); text-decoration: underline dotted var(--ink-3); text-decoration-thickness: 2px; text-underline-offset: 3px; }
