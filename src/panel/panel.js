@@ -87,9 +87,15 @@ async function revealOnPage(term) {
 }
 
 // ---------- refresh ----------
+// One refresh at a time. A request that arrives mid-refresh runs once more afterwards,
+// so a change saved during a refresh (or a tab switch) is never missed.
 let refreshing = null;
+let queued = null; // { reread } for the follow-up run
 async function refresh({ reread = true } = {}) {
-  if (refreshing) return refreshing;
+  if (refreshing) {
+    queued = { reread: reread || !!queued?.reread };
+    return refreshing;
+  }
   refreshing = (async () => {
     data = await store.getAll();
     if (windowId == null) windowId = (await chrome.windows.getCurrent()).id;
@@ -97,7 +103,14 @@ async function refresh({ reread = true } = {}) {
     courseId = pickCourse();
     if (reread) page = await readPage();
     render();
-  })().finally(() => (refreshing = null));
+  })().finally(() => {
+    refreshing = null;
+    if (queued) {
+      const next = queued;
+      queued = null;
+      refresh(next);
+    }
+  });
   return refreshing;
 }
 
@@ -215,9 +228,11 @@ $("course").addEventListener("change", async (e) => {
   courseId = e.target.value;
   autoPicked = false;
   expanded.clear();
-  await store.updateSettings({ sidebarCourse: courseId });
-  // Remember the choice for this course site (e.g. this Canvas course).
-  if (tab?.url && courseKey(tab.url)) await store.rememberCourseSite(tab.url, courseId);
+  // Remember the choice, and for this course site (e.g. this Canvas course), in one write so a
+  // refresh in between can't switch back to the class the site was mapped to before.
+  const s = await store.getSettings();
+  const key = tab?.url ? courseKey(tab.url) : "";
+  await store.updateSettings({ sidebarCourse: courseId, ...(key ? { courseSites: { ...s.courseSites, [key]: courseId } } : {}) });
   render();
 });
 $("search").addEventListener("input", (e) => {

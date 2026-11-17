@@ -68,7 +68,9 @@ export async function attachStudyLayer({ root, getSource, extensionPage = false,
   }
   refresh();
 
-  store.onChange(async () => {
+  store.onChange(async (changes) => {
+    // Lookups cache results in storage too; only terms, courses and settings change what's underlined.
+    if (!changes.terms && !changes.courses && !changes.settings) return;
     data = await store.getAll();
     refresh();
   });

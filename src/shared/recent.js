@@ -25,6 +25,7 @@ async function tx(mode, fn) {
     const out = fn(s);
     t.oncomplete = () => resolve(out instanceof IDBRequest ? out.result : out);
     t.onerror = () => reject(t.error);
+    t.onabort = () => reject(t.error || new Error("transaction aborted"));
   });
 }
 

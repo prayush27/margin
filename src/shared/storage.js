@@ -222,11 +222,12 @@ export async function importData({ courses = [], terms = [] }, { replace = false
     current.terms.push({
       id: uid(),
       term: name,
-      aliases: t.aliases || [],
+      aliases: (Array.isArray(t.aliases) ? t.aliases : []).map(normalize).filter(Boolean),
       definition: t.definition || "",
       courseId,
       context: t.context || "",
       source: t.source || null,
+      defSource: t.defSource || null,
       createdAt: t.createdAt || Date.now(),
       updatedAt: Date.now(),
       stats: t.stats || { box: 0, right: 0, wrong: 0, last: 0 },

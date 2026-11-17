@@ -123,9 +123,11 @@ function trimTo(text, max = 300) {
   return end > 80 ? cut.slice(0, end + 1) : cut.replace(/\s+\S*$/, "") + "…";
 }
 
+const codePoint = (n) => (n > 0 && n <= 0x10ffff ? String.fromCodePoint(n) : "");
 const decode = (s) =>
   s.replace(/<[^>]+>/g, "").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&lt;/g, "<").replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n));
+    .replace(/&quot;/g, '"').replace(/&#39;|&#x27;/g, "'").replace(/&#(\d+);/g, (_, n) => codePoint(+n))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n) => codePoint(parseInt(n, 16)));
 
 async function fetchJson(url, ms = 6000) {
   const ctrl = new AbortController();

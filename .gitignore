@@ -2,3 +2,4 @@
 *.zip
 dist/
 __pycache__/
+video/

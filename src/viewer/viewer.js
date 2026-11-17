@@ -3,6 +3,7 @@ import { buildMatcher } from "../shared/matcher.js";
 import { attachStudyLayer } from "../shared/study-layer.js";
 import { listRecent, getRecent, touchRecent, viewerUrl } from "../shared/recent.js";
 import { createSuggestions } from "./suggest.js";
+import { SHORTCUT_LABEL } from "../shared/ui.js";
 
 const $ = (id) => document.getElementById(id);
 const PDFJS = "../../vendor/pdfjs/";
@@ -10,7 +11,7 @@ const PDFJS = "../../vendor/pdfjs/";
 const params = new URLSearchParams(location.search);
 const fileParam = params.get("file");
 const recentParam = params.get("recent");
-const hashPage = Number(new URLSearchParams(location.hash.slice(1)).get("page")) || null;
+let hashPage = Number(new URLSearchParams(location.hash.slice(1)).get("page")) || null;
 
 let pdfjsLib;
 let viewer;
@@ -62,6 +63,7 @@ async function ensurePdfjs() {
   eventBus.on("pagesinit", () => {
     viewer.currentScaleValue = "page-width";
     if (hashPage) viewer.currentPageNumber = Math.min(hashPage, pdfDoc.numPages);
+    hashPage = null; // only for the PDF this link opened
   });
   eventBus.on("pagechanging", ({ pageNumber }) => {
     $("pageInput").value = pageNumber;
@@ -316,7 +318,7 @@ async function renderSide(initial = false) {
     if (initial || done >= total || done === 0) {
       const empty = el("div", "side-empty");
       if (!terms.length) {
-        empty.innerHTML = `<strong>No terms saved yet.</strong><br>Select a word in this PDF and press <kbd>⌥</kbd><kbd>⇧</kbd><kbd>S</kbd>, or click <strong>Save term</strong>.`;
+        empty.innerHTML = `<strong>No terms saved yet.</strong><br>Select a word in this PDF and press <kbd>${SHORTCUT_LABEL}</kbd>, or click <strong>Save term</strong>.`;
       } else {
         empty.innerHTML = `<strong>None of your saved terms appear here yet.</strong><br>Save new ones as you read and they'll show up in this list.`;
       }
@@ -459,12 +461,15 @@ function wireDrop() {
     $("dropZone").classList.remove("over");
     const item = [...e.dataTransfer.items].find((i) => i.kind === "file");
     if (!item) return;
+    // Both must be requested before the first await: the drop's items stop working after it.
+    const file = item.getAsFile();
+    const handlePromise = item.getAsFileSystemHandle?.();
     try {
-      const handle = await item.getAsFileSystemHandle?.();
+      const handle = await handlePromise;
       if (handle && handle.kind === "file") {
         await openHandle(handle);
       } else {
-        const file = item.getAsFile();
+        if (!file) return;
         await openDocument({ data: new Uint8Array(await file.arrayBuffer()) }, { url: `local:${file.name}`, name: file.name });
       }
     } catch (err) {

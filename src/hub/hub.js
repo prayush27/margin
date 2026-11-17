@@ -1104,13 +1104,14 @@ $("importInput").addEventListener("change", async (e) => {
   e.target.value = "";
   if (!file) return;
   try {
-    const text = await file.text();
+    const text = (await file.text()).replace(/^\uFEFF/, "");
     let added = 0;
     if (file.name.toLowerCase().endsWith(".json")) {
       const json = JSON.parse(text);
       added = await store.importData({ courses: json.courses || [], terms: json.terms || [] });
     } else {
       const rows = parseCsv(text);
+      if (!rows.length) throw new Error("the file is empty");
       let header = rows[0].map((c) => c.trim().toLowerCase());
       const hasHeader = header.includes("term");
       if (!hasHeader) header = ["term", "definition", "course"];
@@ -1136,7 +1137,8 @@ $("importInput").addEventListener("change", async (e) => {
 });
 
 // ---------------- live updates ----------------
-store.onChange(async () => {
+store.onChange(async (changes) => {
+  if (!changes.terms && !changes.courses && !changes.settings) return;
   data = await store.getAll();
   const anyDialogOpen = document.querySelector("dialog[open]");
   if (quiz) {
