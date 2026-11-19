@@ -105,7 +105,7 @@ Every suggestion is labelled with its source and links back to it. Licenses and 
 
 ## Install
 
-Margin is coming soon to the **Chrome Web Store**, which will be the only official place to get it. Until then, you can [try the live demo on the website](https://margin.prayushdesai.com/#try): hover a term, save a new one and take a practice quiz, no install needed.
+**[Add Margin to Chrome](https://chromewebstore.google.com/detail/margin/ooiemoiogihldimmcgpchccdcpplnkcf)**, free on the Chrome Web Store, the only official place to get it. Or [try the live demo on the website](https://margin.prayushdesai.com/#try) first: hover a term, save a new one and take a practice quiz, no install needed.
 
 ### Keyboard shortcuts
 

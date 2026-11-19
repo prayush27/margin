@@ -81,7 +81,7 @@ Leave everything else unticked. Then certify all three:
 
 ## Distribution tab
 
-**Visibility:** Unlisted (only people with the link can install it; switch to Public at launch)
+**Visibility:** Public (since 0.1.1, Nov 2026)
 **Regions:** All regions
 **Pricing:** Free
 
